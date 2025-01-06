@@ -31,6 +31,9 @@ public class User {
     @Column(name = "authority", nullable = false)
     private Integer authority;
 
+    @Column(name = "contest", nullable = false)
+    private Integer contest;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -95,6 +98,14 @@ public class User {
 
     public void setAuthority(Integer authority) {
         this.authority = authority;
+    }
+
+    public Integer getContest() {
+        return contest;
+    }
+
+    public void setContest(Integer contest) {
+        this.contest = contest;
     }
 
     public LocalDateTime getCreatedAt() {

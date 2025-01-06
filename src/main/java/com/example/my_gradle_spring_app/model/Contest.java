@@ -2,6 +2,7 @@ package com.example.my_gradle_spring_app.model;
 
 import jakarta.persistence.*;
 import java.time.LocalDateTime;
+import java.time.OffsetDateTime;
 
 @Entity
 @Table(name = "contests", schema = "public", uniqueConstraints = {
@@ -24,6 +25,9 @@ public class Contest {
 
     @Column(name = "contest_pw", length = 255)
     private String contestPw;
+
+    @Column(name = "event_time", nullable = false)
+    private OffsetDateTime eventTime;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -73,6 +77,14 @@ public class Contest {
 
     public void setContestPw(String contestPw) {
         this.contestPw = contestPw;
+    }
+
+    public OffsetDateTime getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(OffsetDateTime eventTime) {
+        this.eventTime = eventTime;
     }
 
     public LocalDateTime getCreatedAt() {

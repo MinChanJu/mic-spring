@@ -6,13 +6,12 @@ import com.example.my_gradle_spring_app.model.Problem;
 import com.example.my_gradle_spring_app.model.ProblemDTO;
 import com.example.my_gradle_spring_app.service.ExampleService;
 import com.example.my_gradle_spring_app.service.ProblemService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.server.ResponseStatusException;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,19 +19,15 @@ import java.util.List;
 @RequestMapping("/api/problems")
 public class ProblemController {
 
-    @Autowired
-    private ProblemService problemService;
-    @Autowired
-    private ExampleService exampleService;
+    @Autowired private ProblemService problemService;
+    @Autowired private ExampleService exampleService;
 
     @PostMapping
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<Problem> getAllProblems() {
         return problemService.getAllProblems();
     }
 
     @PostMapping("/{id}")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResponseEntity<Problem> getProblemById(@PathVariable Long id) {
         return problemService.getProblemById(id)
                 .map(ResponseEntity::ok)
@@ -40,7 +35,6 @@ public class ProblemController {
     }
 
     @PostMapping("/create")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Problem createProblem(@RequestBody ProblemDTO problemDTO) {
         try {
             // Problem 객체 생성 및 데이터 설정
@@ -76,19 +70,16 @@ public class ProblemController {
     }
 
     @PostMapping("/examples/{id}")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<Example> getProblemExamples(@PathVariable Long id) {
         return exampleService.getExamplesByProblemId(id.intValue());
     }
 
     @PutMapping("/{id}")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResponseEntity<Problem> updateProblem(@PathVariable Long id, @RequestBody ProblemDTO problemDetails) {
         return ResponseEntity.ok(problemService.updateProblem(id, problemDetails));
     }
 
     @DeleteMapping("/{id}")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResponseEntity<Void> deleteProblem(@PathVariable Long id) {
         problemService.deleteProblem(id);
         return ResponseEntity.noContent().build();

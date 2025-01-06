@@ -7,38 +7,38 @@ import com.example.my_gradle_spring_app.repository.ProblemRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Optional;
+import java.time.OffsetDateTime;
 
 @Service
 public class ContestService {
     
-    @Autowired
-    private ContestRepository contestRepository;
-    @Autowired
-    private ProblemRepository problemRepository;
-    @Autowired
-    private ProblemService problemService;
+    @Autowired private ContestRepository contestRepository;
+    @Autowired private ProblemRepository problemRepository;
+    @Autowired private ProblemService problemService;
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public List<Contest> getAllContests() {
         return contestRepository.findAll();
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public List<Contest> getBeforeContests() {
+        return contestRepository.findByEventTimeBefore(OffsetDateTime.now());
+    }
+
+    public List<Contest> getAfterContests() {
+        return contestRepository.findByEventTimeAfter(OffsetDateTime.now());
+    }
+
     public Optional<Contest> getContestById(Long id) {
         return contestRepository.findById(id);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Contest createContest(Contest contest) {
         return contestRepository.save(contest);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public Contest updateContest(Long id, Contest contestDetails) {
         Contest contest = contestRepository.findById(id).orElseThrow(() -> new RuntimeException("Contest not found"));
 
@@ -49,7 +49,6 @@ public class ContestService {
         return contestRepository.save(contest);
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public void deleteContest(Long id) {
         Contest contest = contestRepository.findById(id).orElseThrow(() -> new RuntimeException("Contest not found"));
         contestRepository.delete(contest);

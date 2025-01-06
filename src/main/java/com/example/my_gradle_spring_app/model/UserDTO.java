@@ -1,6 +1,7 @@
 package com.example.my_gradle_spring_app.model;
 
 import java.time.LocalDateTime;
+
 public class UserDTO {
     private Long id;
     private String name;

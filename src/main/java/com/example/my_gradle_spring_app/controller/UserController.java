@@ -1,12 +1,13 @@
 package com.example.my_gradle_spring_app.controller;
 
+import com.example.my_gradle_spring_app.model.Solved;
 import com.example.my_gradle_spring_app.model.User;
 import com.example.my_gradle_spring_app.model.UserDTO;
+import com.example.my_gradle_spring_app.service.SolvedService;
 import com.example.my_gradle_spring_app.service.UserService;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
@@ -15,17 +16,15 @@ import java.util.List;
 @RequestMapping("/api/users")
 public class UserController {
 
-    @Autowired
-    private UserService userService;
+    @Autowired private UserService userService;
+    @Autowired private SolvedService solvedService;
 
     @PostMapping
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public List<UserDTO> getAllUsers() {
+    public List<User> getAllUsers() {
         return userService.getAllUsers();
     }
 
     @PostMapping("/{userId}")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public UserDTO getUserDTOByUserId(@PathVariable String userId) {
         User user = userService.getUserByUserId(userId);
         if (user == null) {
@@ -36,7 +35,6 @@ public class UserController {
     }
 
     @PostMapping("/{userId}/{userPw}")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public User getUserByUserId(@PathVariable String userId, @PathVariable String userPw) {
         User user = userService.getUserByUserId(userId);
         if (user == null) {
@@ -48,20 +46,27 @@ public class UserController {
         }
     }
 
+    @PostMapping("/solved/user/{userId}")
+    public List<Solved> getSolvedOfUser(@PathVariable String userId) {
+        return solvedService.getSolvedsByUserId(userId);
+    }
+
+    @PostMapping("/solved/problem/{problemId}")
+    public List<Solved> getSolvedOfUser(@PathVariable Long problemId) {
+        return solvedService.getSolvedsByProblemId(problemId);
+    }
+
     @PostMapping("/create")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public User createUser(@RequestBody User user) {
         return userService.createUser(user);
     }
 
     @PutMapping("/{id}")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
         return ResponseEntity.ok(userService.updateUser(id, userDetails));
     }
 
     @DeleteMapping("/{id}")
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public ResponseEntity<Void> deleteUser(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();

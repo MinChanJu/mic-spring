@@ -7,8 +7,6 @@ import com.example.my_gradle_spring_app.service.ExampleService;
 import com.example.my_gradle_spring_app.service.ProblemService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.tools.*;
@@ -22,13 +20,10 @@ import java.lang.reflect.Method;
 @RequestMapping("/api/code")
 public class CodeController {
 
-    @Autowired
-    private ExampleService exampleService;
-    @Autowired
-    private ProblemService problemService;
+    @Autowired private ExampleService exampleService;
+    @Autowired private ProblemService problemService;
 
     @PostMapping
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
     public String submitCode(@RequestBody CodeDTO codeDTO) {
         String code = codeDTO.getCode();
         String lang = codeDTO.getLang();
