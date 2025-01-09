@@ -1,6 +1,7 @@
 package com.example.my_gradle_spring_app.controller;
 
 import com.example.my_gradle_spring_app.model.Solved;
+import com.example.my_gradle_spring_app.model.SolvedDTO;
 import com.example.my_gradle_spring_app.model.User;
 import com.example.my_gradle_spring_app.model.UserDTO;
 import com.example.my_gradle_spring_app.service.SolvedService;
@@ -11,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
+
 
 @RestController
 @RequestMapping("/api/users")
@@ -37,16 +39,30 @@ public class UserController {
     @PostMapping("/{userId}/{userPw}")
     public User getUserByUserId(@PathVariable String userId, @PathVariable String userPw) {
         User user = userService.getUserByUserId(userId);
-        if (user == null) {
-            return null;
-        } else if (user.getUserPw().equals(userPw)) {
-            return user;
-        } else {
-            return null;
+        if (user == null || !user.getUserPw().equals(userPw)) {
+            user = new User();
+            user.setId(-1L);
+            user.setContest(-1);
+            user.setAuthority(-1);
         }
+        return user;
     }
 
-    @PostMapping("/solved/user/{userId}")
+    @PostMapping("/solved")
+    public Solved solvedProblem(@RequestBody SolvedDTO solvedDTO) {
+        List<Solved> solveds = solvedService.getSolvedsByUserId(solvedDTO.getUserId());
+        Solved newSolved = new Solved();
+        newSolved.setUserId(solvedDTO.getUserId());
+        newSolved.setProblemId(solvedDTO.getProblemId());
+        newSolved.setScore(solvedDTO.getScore());
+        for (Solved solved : solveds) {
+            if (solved.getProblemId() == solvedDTO.getProblemId()) newSolved.setId(solved.getId());
+        }
+        return solvedService.createSolved(newSolved);
+    }
+    
+
+    @PostMapping("/solved/{userId}")
     public List<Solved> getSolvedOfUser(@PathVariable String userId) {
         return solvedService.getSolvedsByUserId(userId);
     }

@@ -4,7 +4,7 @@ import jakarta.persistence.*;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "examples", schema = "public" )
+@Table(name = "solveds", schema = "public" )
 public class Solved {
 
     @Id
@@ -17,8 +17,16 @@ public class Solved {
     @Column(name = "problem_id", nullable = false)
     private Integer problemId;
 
+    @Column(name = "score", nullable = false)
+    private String score;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
+
+    @PrePersist
+    protected void onCreate() {
+        this.createdAt = LocalDateTime.now();
+    }
 
     public void setId(Long id) {
         this.id = id;
@@ -42,6 +50,14 @@ public class Solved {
 
     public Integer getProblemId() {
         return problemId;
+    }
+
+    public String getScore() {
+        return score;
+    }
+
+    public void setScore(String score) {
+        this.score = score;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
