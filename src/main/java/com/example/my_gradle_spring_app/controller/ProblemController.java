@@ -57,7 +57,7 @@ public class ProblemController {
                 Example example = new Example();
                 example.setExampleInput(exampleDTO.getExampleInput());
                 example.setExampleOutput(exampleDTO.getExampleOutput());
-                example.setProblemId(curProblem.getId().intValue());
+                example.setProblemId(curProblem.getId());
                 exampleService.createExample(example);
             }
 
@@ -71,7 +71,7 @@ public class ProblemController {
 
     @PostMapping("/examples/{id}")
     public List<Example> getProblemExamples(@PathVariable Long id) {
-        return exampleService.getExamplesByProblemId(id.intValue());
+        return exampleService.getExamplesByProblemId(id);
     }
 
     @PutMapping("/{id}")

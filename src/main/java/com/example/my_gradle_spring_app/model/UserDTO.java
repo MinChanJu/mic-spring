@@ -7,7 +7,7 @@ public class UserDTO {
     private String name;
     private String userId;
     private String email;
-    private Integer authority;
+    private Long authority;
     private LocalDateTime createdAt;
 
     // 기본 생성자 (필수는 아니지만, 필요할 수 있음)
@@ -15,7 +15,7 @@ public class UserDTO {
     }
 
     // 모든 필드를 매개변수로 받는 생성자
-    public UserDTO(Long id, String name, String userId, String email, Integer authority, LocalDateTime createdAt) {
+    public UserDTO(Long id, String name, String userId, String email, Long authority, LocalDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.userId = userId;
@@ -57,11 +57,11 @@ public class UserDTO {
         this.email = email;
     }
 
-    public Integer getAuthority() {
+    public Long getAuthority() {
         return authority;
     }
 
-    public void setAuthority(Integer authority) {
+    public void setAuthority(Long authority) {
         this.authority = authority;
     }
 

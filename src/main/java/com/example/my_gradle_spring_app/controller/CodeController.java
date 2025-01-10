@@ -27,7 +27,7 @@ public class CodeController {
     public String submitCode(@RequestBody CodeDTO codeDTO) {
         String code = codeDTO.getCode();
         String lang = codeDTO.getLang();
-        Integer problemId = codeDTO.getProblemId();
+        Long problemId = codeDTO.getProblemId();
         List<Example> examples = exampleService.getExamplesByProblemId(problemId);
         Optional<Problem> problem = problemService.getProblemById(problemId.longValue());
         if (problem.isPresent()) {

@@ -29,10 +29,10 @@ public class User {
     private String email;
 
     @Column(name = "authority", nullable = false)
-    private Integer authority;
+    private Long authority;
 
     @Column(name = "contest", nullable = false)
-    private Integer contest;
+    private Long contest;
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
@@ -92,19 +92,19 @@ public class User {
         this.email = email;
     }
 
-    public Integer getAuthority() {
+    public Long getAuthority() {
         return authority;
     }
 
-    public void setAuthority(Integer authority) {
+    public void setAuthority(Long authority) {
         this.authority = authority;
     }
 
-    public Integer getContest() {
+    public Long getContest() {
         return contest;
     }
 
-    public void setContest(Integer contest) {
+    public void setContest(Long contest) {
         this.contest = contest;
     }
 

@@ -24,6 +24,10 @@ public class SolvedService {
         return solvedRepository.findByProblemId(problemId);
     }
 
+    public Solved getUserIdAndProblemId(String userId, Long problemId) {
+        return solvedRepository.findByUserIdAndProblemId(userId, problemId).orElse(null);
+    }
+
     public Solved createSolved(Solved solved) {
         return solvedRepository.save(solved);
     }

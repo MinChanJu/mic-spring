@@ -17,7 +17,7 @@ public class ExampleService {
         return exampleRepository.findAll();
     }
 
-    public List<Example> getExamplesByProblemId(Integer problemId) {
+    public List<Example> getExamplesByProblemId(Long problemId) {
         return exampleRepository.findByProblemId(problemId);
     }
 

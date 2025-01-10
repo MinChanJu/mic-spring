@@ -3,7 +3,7 @@ package com.example.my_gradle_spring_app.model;
 import java.util.List;
 
 public class ProblemDTO {
-    private Integer contestId;
+    private Long contestId;
     private String contestName;
     private String userId;
     private String problemName;
@@ -16,11 +16,11 @@ public class ProblemDTO {
 
     // Getters and Setters
 
-    public Integer getContestId() {
+    public Long getContestId() {
         return contestId;
     }
 
-    public void setContestId(Integer contestId) {
+    public void setContestId(Long contestId) {
         this.contestId = contestId;
     }
 

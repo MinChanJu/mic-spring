@@ -45,6 +45,8 @@ public class ContestService {
         contest.setContestName(contestDetails.getContestName());
         contest.setContestDescription(contestDetails.getContestDescription());
         contest.setContestPw(contestDetails.getContestPw());
+        contest.setEventTime(contestDetails.getEventTime());
+        contest.setTime(contestDetails.getTime());
 
         return contestRepository.save(contest);
     }
@@ -52,7 +54,7 @@ public class ContestService {
     public void deleteContest(Long id) {
         Contest contest = contestRepository.findById(id).orElseThrow(() -> new RuntimeException("Contest not found"));
         contestRepository.delete(contest);
-        List<Problem> problems = problemRepository.findByContestId(id.intValue());
+        List<Problem> problems = problemRepository.findByContestId(id);
         for (Problem problem : problems) {
             problemService.deleteProblem(problem.getId());
         }

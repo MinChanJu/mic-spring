@@ -42,8 +42,8 @@ public class UserController {
         if (user == null || !user.getUserPw().equals(userPw)) {
             user = new User();
             user.setId(-1L);
-            user.setContest(-1);
-            user.setAuthority(-1);
+            user.setContest(-1L);
+            user.setAuthority(-1L);
         }
         return user;
     }

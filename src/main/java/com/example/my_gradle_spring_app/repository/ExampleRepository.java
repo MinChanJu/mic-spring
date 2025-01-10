@@ -9,5 +9,5 @@ import java.util.List;
 
 @Repository
 public interface ExampleRepository extends JpaRepository<Example, Long> {
-    List<Example> findByProblemId(Integer problemId);
+    List<Example> findByProblemId(Long problemId);
 }

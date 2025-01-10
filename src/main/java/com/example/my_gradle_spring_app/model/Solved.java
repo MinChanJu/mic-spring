@@ -15,7 +15,7 @@ public class Solved {
     private String userId;
 
     @Column(name = "problem_id", nullable = false)
-    private Integer problemId;
+    private Long problemId;
 
     @Column(name = "score", nullable = false)
     private String score;
@@ -44,11 +44,11 @@ public class Solved {
         return userId;
     }
 
-    public void setProblemId(Integer problemId) {
+    public void setProblemId(Long problemId) {
         this.problemId = problemId;
     }
 
-    public Integer getProblemId() {
+    public Long getProblemId() {
         return problemId;
     }
 

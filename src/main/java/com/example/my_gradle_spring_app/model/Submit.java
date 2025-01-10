@@ -1,16 +1,12 @@
 package com.example.my_gradle_spring_app.model;
 
-public class SolvedDTO {
-    private String userId;
+public class Submit {
     private Long problemId;
-    private String score;
+    private Long score;
 
-    public String getUserId() {
-        return userId;
-    }
-    
-    public void setUserId(String userId) {
-        this.userId = userId;
+    public Submit(Long problemId, Long score) {
+        this.problemId = problemId;
+        this.score = score;
     }
 
     public Long getProblemId() {
@@ -21,11 +17,11 @@ public class SolvedDTO {
         this.problemId = problemId;
     }
 
-    public String getScore() {
+    public Long getScore() {
         return score;
     }
 
-    public void setScore(String score) {
+    public void setScore(Long score) {
         this.score = score;
     }
 }

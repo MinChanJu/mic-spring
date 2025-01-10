@@ -12,7 +12,7 @@ public class Example {
     private Long id;
 
     @Column(name = "problem_id", nullable = false)
-    private Integer problemId;
+    private Long problemId;
 
     @Column(name = "example_input", nullable = false, columnDefinition = "TEXT")
     private String ExampleInput;
@@ -38,11 +38,11 @@ public class Example {
         this.id = id;
     }
 
-    public Integer getProblemId() {
+    public Long getProblemId() {
         return problemId;
     }
 
-    public void setProblemId(Integer problemId) {
+    public void setProblemId(Long problemId) {
         this.problemId = problemId;
     }
 

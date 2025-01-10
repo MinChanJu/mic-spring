@@ -28,6 +28,10 @@ public class ProblemService {
         return problemRepository.findById(id);
     }
 
+    public List<Problem> getProblemByContestId(Long contestId) {
+        return problemRepository.findByContestId(contestId);
+    }
+
     public Problem createProblem(Problem problem) {
         return problemRepository.save(problem);
     }
@@ -42,7 +46,7 @@ public class ProblemService {
         problem.setProblemExampleInput(problemDetails.getProblemExampleInput());
         problem.setProblemExampleOutput(problemDetails.getProblemExampleOutput());
         
-        List<Example> examples = exampleRepository.findByProblemId(id.intValue());
+        List<Example> examples = exampleRepository.findByProblemId(id);
         for (Example example : examples) {
             exampleService.deleteExample(example.getId());
         }
@@ -51,7 +55,7 @@ public class ProblemService {
             Example example = new Example();
             example.setExampleInput(exampleDTO.getExampleInput());
             example.setExampleOutput(exampleDTO.getExampleOutput());
-            example.setProblemId(id.intValue());
+            example.setProblemId(id);
             exampleService.createExample(example);
         }
 
@@ -61,7 +65,7 @@ public class ProblemService {
     public void deleteProblem(Long id) {
         Problem problem = problemRepository.findById(id).orElseThrow(() -> new RuntimeException("Problem not found"));
         problemRepository.delete(problem);
-        List<Example> examples = exampleRepository.findByProblemId(id.intValue());
+        List<Example> examples = exampleRepository.findByProblemId(id);
         for (Example example : examples) {
             exampleService.deleteExample(example.getId());
         }

@@ -29,6 +29,9 @@ public class Contest {
     @Column(name = "event_time", nullable = false)
     private OffsetDateTime eventTime;
 
+    @Column(name = "time", nullable = false)
+    private Long time;
+
     @Column(name = "created_at", nullable = false, updatable = false)
     private LocalDateTime createdAt;
 
@@ -85,6 +88,14 @@ public class Contest {
 
     public void setEventTime(OffsetDateTime eventTime) {
         this.eventTime = eventTime;
+    }
+
+    public Long getTime() {
+        return time;
+    }
+
+    public void setTime(Long time) {
+        this.time = time;
     }
 
     public LocalDateTime getCreatedAt() {

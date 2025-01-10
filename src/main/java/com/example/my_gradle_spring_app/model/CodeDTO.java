@@ -3,7 +3,7 @@ package com.example.my_gradle_spring_app.model;
 public class CodeDTO {
     private String code;
     private String lang;
-    private Integer problemId;
+    private Long problemId;
 
     // Getters and Setters
     public String getCode() {
@@ -22,11 +22,11 @@ public class CodeDTO {
         this.lang = lang;
     }
 
-    public Integer getProblemId() {
+    public Long getProblemId() {
         return problemId;
     }
 
-    public void setProblemId(Integer problemId) {
+    public void setProblemId(Long problemId) {
         this.problemId = problemId;
     }
 }
