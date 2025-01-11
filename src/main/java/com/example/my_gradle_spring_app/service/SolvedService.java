@@ -10,6 +10,7 @@ import java.util.List;
 
 @Service
 public class SolvedService {
+    
     @Autowired private SolvedRepository solvedRepository;
 
     public List<Solved> getAllSolveds() {
@@ -24,7 +25,7 @@ public class SolvedService {
         return solvedRepository.findByProblemId(problemId);
     }
 
-    public Solved getUserIdAndProblemId(String userId, Long problemId) {
+    public Solved getSolvedByUserIdAndProblemId(String userId, Long problemId) {
         return solvedRepository.findByUserIdAndProblemId(userId, problemId).orElse(null);
     }
 
@@ -32,8 +33,26 @@ public class SolvedService {
         return solvedRepository.save(solved);
     }
 
+    public Solved updateSolved(Solved solved) {
+        return solvedRepository.save(solved);
+    }
+
     public void deleteSolved(Long id) {
         Solved solved = solvedRepository.findById(id).orElseThrow(() -> new RuntimeException("solved not found"));
         solvedRepository.delete(solved);
+    }
+
+    public void deleteSolvedByProblemId(Long problemId) {
+        List<Solved> solveds = solvedRepository.findByProblemId(problemId);
+        for (Solved solved : solveds) {
+            solvedRepository.delete(solved);
+        }
+    }
+
+    public void deleteSolvedByUserId(String userId) {
+        List<Solved> solveds = solvedRepository.findByUserId(userId);
+        for (Solved solved : solveds) {
+            solvedRepository.delete(solved);
+        }
     }
 }

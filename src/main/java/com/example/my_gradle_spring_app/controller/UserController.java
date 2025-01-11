@@ -1,10 +1,7 @@
 package com.example.my_gradle_spring_app.controller;
 
-import com.example.my_gradle_spring_app.model.Solved;
-import com.example.my_gradle_spring_app.model.SolvedDTO;
 import com.example.my_gradle_spring_app.model.User;
 import com.example.my_gradle_spring_app.model.UserDTO;
-import com.example.my_gradle_spring_app.service.SolvedService;
 import com.example.my_gradle_spring_app.service.UserService;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +16,6 @@ import java.util.List;
 public class UserController {
 
     @Autowired private UserService userService;
-    @Autowired private SolvedService solvedService;
 
     @PostMapping
     public List<User> getAllUsers() {
@@ -48,38 +44,14 @@ public class UserController {
         return user;
     }
 
-    @PostMapping("/solved")
-    public Solved solvedProblem(@RequestBody SolvedDTO solvedDTO) {
-        List<Solved> solveds = solvedService.getSolvedsByUserId(solvedDTO.getUserId());
-        Solved newSolved = new Solved();
-        newSolved.setUserId(solvedDTO.getUserId());
-        newSolved.setProblemId(solvedDTO.getProblemId());
-        newSolved.setScore(solvedDTO.getScore());
-        for (Solved solved : solveds) {
-            if (solved.getProblemId() == solvedDTO.getProblemId()) newSolved.setId(solved.getId());
-        }
-        return solvedService.createSolved(newSolved);
-    }
-    
-
-    @PostMapping("/solved/{userId}")
-    public List<Solved> getSolvedOfUser(@PathVariable String userId) {
-        return solvedService.getSolvedsByUserId(userId);
-    }
-
-    @PostMapping("/solved/problem/{problemId}")
-    public List<Solved> getSolvedOfUser(@PathVariable Long problemId) {
-        return solvedService.getSolvedsByProblemId(problemId);
-    }
-
     @PostMapping("/create")
     public User createUser(@RequestBody User user) {
         return userService.createUser(user);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<User> updateUser(@PathVariable Long id, @RequestBody User userDetails) {
-        return ResponseEntity.ok(userService.updateUser(id, userDetails));
+    @PutMapping("/update")
+    public ResponseEntity<User> updateUser(@RequestBody User user) {
+        return ResponseEntity.ok(userService.updateUser(user));
     }
 
     @DeleteMapping("/{id}")

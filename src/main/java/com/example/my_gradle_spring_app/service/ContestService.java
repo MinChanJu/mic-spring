@@ -3,7 +3,6 @@ package com.example.my_gradle_spring_app.service;
 import com.example.my_gradle_spring_app.model.Contest;
 import com.example.my_gradle_spring_app.model.Problem;
 import com.example.my_gradle_spring_app.repository.ContestRepository;
-import com.example.my_gradle_spring_app.repository.ProblemRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -16,7 +15,6 @@ import java.time.OffsetDateTime;
 public class ContestService {
     
     @Autowired private ContestRepository contestRepository;
-    @Autowired private ProblemRepository problemRepository;
     @Autowired private ProblemService problemService;
 
     public List<Contest> getAllContests() {
@@ -36,25 +34,26 @@ public class ContestService {
     }
 
     public Contest createContest(Contest contest) {
+        if (contestRepository.existsByContestName(contest.getContestName())) {
+            Contest sub = new Contest();
+            sub.setId(-1L);
+            return sub;
+        }
         return contestRepository.save(contest);
     }
 
-    public Contest updateContest(Long id, Contest contestDetails) {
-        Contest contest = contestRepository.findById(id).orElseThrow(() -> new RuntimeException("Contest not found"));
+    public Contest updateContest(Contest contest) {
+        if (contestRepository.existsById(contest.getId())) return contestRepository.save(contest);
 
-        contest.setContestName(contestDetails.getContestName());
-        contest.setContestDescription(contestDetails.getContestDescription());
-        contest.setContestPw(contestDetails.getContestPw());
-        contest.setEventTime(contestDetails.getEventTime());
-        contest.setTime(contestDetails.getTime());
-
-        return contestRepository.save(contest);
+        Contest sub = new Contest();
+        sub.setId(-1L);
+        return sub;
     }
 
     public void deleteContest(Long id) {
         Contest contest = contestRepository.findById(id).orElseThrow(() -> new RuntimeException("Contest not found"));
         contestRepository.delete(contest);
-        List<Problem> problems = problemRepository.findByContestId(id);
+        List<Problem> problems = problemService.getProblemByContestId(id);
         for (Problem problem : problems) {
             problemService.deleteProblem(problem.getId());
         }

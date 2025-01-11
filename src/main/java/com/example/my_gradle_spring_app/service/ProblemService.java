@@ -1,10 +1,6 @@
 package com.example.my_gradle_spring_app.service;
 
-import com.example.my_gradle_spring_app.model.Example;
-import com.example.my_gradle_spring_app.model.ExampleDTO;
 import com.example.my_gradle_spring_app.model.Problem;
-import com.example.my_gradle_spring_app.model.ProblemDTO;
-import com.example.my_gradle_spring_app.repository.ExampleRepository;
 import com.example.my_gradle_spring_app.repository.ProblemRepository;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,10 +11,9 @@ import java.util.Optional;
 
 @Service
 public class ProblemService {
-    
-    @Autowired private ProblemRepository problemRepository;
-    @Autowired private ExampleRepository exampleRepository;
-    @Autowired private ExampleService exampleService;
+
+    @Autowired
+    private ProblemRepository problemRepository;
 
     public List<Problem> getAllProblems() {
         return problemRepository.findAll();
@@ -33,41 +28,24 @@ public class ProblemService {
     }
 
     public Problem createProblem(Problem problem) {
+        if (problemRepository.existsByProblemName(problem.getProblemName())) {
+            Problem sub = new Problem();
+            sub.setId(-1L);
+            return sub;
+        }
         return problemRepository.save(problem);
     }
 
-    public Problem updateProblem(Long id, ProblemDTO problemDetails) {
-        Problem problem = problemRepository.findById(id).orElseThrow(() -> new RuntimeException("Problem not found"));
+    public Problem updateProblem(Problem problem) {
+        if (problemRepository.existsById(problem.getId())) return problemRepository.save(problem);
 
-        problem.setProblemName(problemDetails.getProblemName());
-        problem.setProblemDescription(problemDetails.getProblemDescription());
-        problem.setProblemInputDescription(problemDetails.getProblemInputDescription());
-        problem.setProblemOutputDescription(problemDetails.getProblemOutputDescription());
-        problem.setProblemExampleInput(problemDetails.getProblemExampleInput());
-        problem.setProblemExampleOutput(problemDetails.getProblemExampleOutput());
-        
-        List<Example> examples = exampleRepository.findByProblemId(id);
-        for (Example example : examples) {
-            exampleService.deleteExample(example.getId());
-        }
-
-        for (ExampleDTO exampleDTO : problemDetails.getExamples()) {
-            Example example = new Example();
-            example.setExampleInput(exampleDTO.getExampleInput());
-            example.setExampleOutput(exampleDTO.getExampleOutput());
-            example.setProblemId(id);
-            exampleService.createExample(example);
-        }
-
-        return problemRepository.save(problem);
+        Problem sub = new Problem();
+        sub.setId(-1L);
+        return sub;
     }
 
     public void deleteProblem(Long id) {
         Problem problem = problemRepository.findById(id).orElseThrow(() -> new RuntimeException("Problem not found"));
         problemRepository.delete(problem);
-        List<Example> examples = exampleRepository.findByProblemId(id);
-        for (Example example : examples) {
-            exampleService.deleteExample(example.getId());
-        }
     }
 }

@@ -43,9 +43,9 @@ public class MyController {
         for (User user : participants) {
             List<Submit> solveProblems = new ArrayList<>();
             for (Problem problem : problems) {
-                Solved solved = solvedService.getUserIdAndProblemId(user.getUserId(), problem.getId());
-                if (solved == null) solveProblems.add(new Submit(problem.getId(), 0L));
-                else solveProblems.add(new Submit(problem.getId(), solved.getScore().equals("정답") ? 1L : 0L));
+                Solved solved = solvedService.getSolvedByUserIdAndProblemId(user.getUserId(), problem.getId());
+                if (solved == null) solveProblems.add(new Submit(problem.getId(), "0"));
+                else solveProblems.add(new Submit(problem.getId(), solved.getScore()));
             }
             contestScores.add(new ContestScore(user.getName(), solveProblems));
         }

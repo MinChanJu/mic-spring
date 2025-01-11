@@ -12,4 +12,5 @@ import java.time.OffsetDateTime;
 public interface ContestRepository extends JpaRepository<Contest, Long> {
     List<Contest> findByEventTimeBefore(OffsetDateTime currentTime);
     List<Contest> findByEventTimeAfter(OffsetDateTime currentTime);
+    boolean existsByContestName(String contestName);
 }

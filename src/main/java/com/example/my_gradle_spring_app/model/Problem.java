@@ -16,9 +16,6 @@ public class Problem {
     @Column(name = "contest_id")
     private Long contestId;
 
-    @Column(name = "contest_name", length = 100)
-    private String contestName;
-
     @Column(name = "user_id", nullable = false, columnDefinition = "TEXT")
     private String userId;
 
@@ -64,14 +61,6 @@ public class Problem {
 
     public void setContestId(Long contestId) {
         this.contestId = contestId;
-    }
-
-    public String getContestName() {
-        return contestName;
-    }
-
-    public void setContestName(String contestName) {
-        this.contestName = contestName;
     }
 
     public String getUserId() {

@@ -32,9 +32,9 @@ public class ContestController {
         return contestService.createContest(contest);
     }
 
-    @PutMapping("/{id}")
-    public ResponseEntity<Contest> updateContest(@PathVariable Long id, @RequestBody Contest contestDetails) {
-        return ResponseEntity.ok(contestService.updateContest(id, contestDetails));
+    @PutMapping("/update")
+    public ResponseEntity<Contest> updateContest(@RequestBody Contest contest) {
+        return ResponseEntity.ok(contestService.updateContest(contest));
     }
 
     @DeleteMapping("/{id}")

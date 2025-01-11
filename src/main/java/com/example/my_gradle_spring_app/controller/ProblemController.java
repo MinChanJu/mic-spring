@@ -1,17 +1,15 @@
 package com.example.my_gradle_spring_app.controller;
 
 import com.example.my_gradle_spring_app.model.Example;
-import com.example.my_gradle_spring_app.model.ExampleDTO;
 import com.example.my_gradle_spring_app.model.Problem;
 import com.example.my_gradle_spring_app.model.ProblemDTO;
 import com.example.my_gradle_spring_app.service.ExampleService;
 import com.example.my_gradle_spring_app.service.ProblemService;
+import com.example.my_gradle_spring_app.service.SolvedService;
 
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 
@@ -21,6 +19,7 @@ public class ProblemController {
 
     @Autowired private ProblemService problemService;
     @Autowired private ExampleService exampleService;
+    @Autowired private SolvedService solvedService;
 
     @PostMapping
     public List<Problem> getAllProblems() {
@@ -35,53 +34,30 @@ public class ProblemController {
     }
 
     @PostMapping("/create")
-    public Problem createProblem(@RequestBody ProblemDTO problemDTO) {
-        try {
-            // Problem 객체 생성 및 데이터 설정
-            Problem problem = new Problem();
-            problem.setContestId(problemDTO.getContestId());
-            problem.setContestName(problemDTO.getContestName());
-            problem.setUserId(problemDTO.getUserId());
-            problem.setProblemName(problemDTO.getProblemName());
-            problem.setProblemDescription(problemDTO.getProblemDescription());
-            problem.setProblemInputDescription(problemDTO.getProblemInputDescription());
-            problem.setProblemOutputDescription(problemDTO.getProblemOutputDescription());
-            problem.setProblemExampleInput(problemDTO.getProblemExampleInput());
-            problem.setProblemExampleOutput(problemDTO.getProblemExampleOutput());
+    public Problem createProblem(@RequestBody ProblemDTO problem) {
+        Problem curProblem = problemService.createProblem(problem.getProblem());
 
-            // Problem 저장
-            Problem curProblem = problemService.createProblem(problem);
-
-            // Example 저장
-            for (ExampleDTO exampleDTO : problemDTO.getExamples()) {
-                Example example = new Example();
-                example.setExampleInput(exampleDTO.getExampleInput());
-                example.setExampleOutput(exampleDTO.getExampleOutput());
-                example.setProblemId(curProblem.getId());
-                exampleService.createExample(example);
-            }
-
-            return curProblem;
-        } catch (Exception e) {
-            // 예외 발생 시 롤백 및 로그 출력
-            e.printStackTrace();
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "An error occurred while creating the problem", e);
+        for (Example example : problem.getExamples()) {
+            example.setProblemId(curProblem.getId());
+            exampleService.createExample(example);
         }
+
+        return curProblem;
     }
 
-    @PostMapping("/examples/{id}")
-    public List<Example> getProblemExamples(@PathVariable Long id) {
-        return exampleService.getExamplesByProblemId(id);
-    }
-
-    @PutMapping("/{id}")
-    public ResponseEntity<Problem> updateProblem(@PathVariable Long id, @RequestBody ProblemDTO problemDetails) {
-        return ResponseEntity.ok(problemService.updateProblem(id, problemDetails));
+    @PutMapping("/update")
+    public ResponseEntity<Problem> updateProblem(@RequestBody ProblemDTO problem) {
+        for (Example example : problem.getExamples()) {
+            exampleService.updateExample(example);
+        }
+        return ResponseEntity.ok(problemService.updateProblem(problem.getProblem()));
     }
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Void> deleteProblem(@PathVariable Long id) {
         problemService.deleteProblem(id);
+        exampleService.deleteExampleByProblemId(id);
+        solvedService.deleteSolvedByProblemId(id);
         return ResponseEntity.noContent().build();
     }
 }

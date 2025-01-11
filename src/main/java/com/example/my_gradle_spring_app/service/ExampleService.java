@@ -25,9 +25,19 @@ public class ExampleService {
         return exampleRepository.save(example);
     }
 
+    public Example updateExample(Example example) {
+        return exampleRepository.save(example);
+    }
+
     public void deleteExample(Long id) {
         Example example = exampleRepository.findById(id).orElseThrow(() -> new RuntimeException("Problem not found"));
         exampleRepository.delete(example);
     }
 
+    public void deleteExampleByProblemId(Long problemId) {
+        List<Example> examples = exampleRepository.findByProblemId(problemId);
+        for (Example example : examples) {
+            exampleRepository.delete(example);
+        }
+    }
 }
