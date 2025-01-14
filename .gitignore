@@ -38,3 +38,7 @@ out/
 
 ### API Key ###
 .env
+
+# MacOs
+.DS_Store
+._*
