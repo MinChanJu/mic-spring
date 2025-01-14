@@ -1,14 +1,29 @@
 package com.example.my_gradle_spring_app.model;
 
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+
 import java.time.ZonedDateTime;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "solves", uniqueConstraints = {
         @UniqueConstraint(name = "uk_solves_multi_user_id_problem_id", columnNames = { "user_id", "problem_id" })
 })
 public class Solve {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -24,44 +39,4 @@ public class Solve {
 
     @Column(name = "created_at", nullable = false, updatable = false)
     private ZonedDateTime createdAt = ZonedDateTime.now();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public Long getProblemId() {
-        return problemId;
-    }
-
-    public void setProblemId(Long problemId) {
-        this.problemId = problemId;
-    }
-
-    public Short getScore() {
-        return score;
-    }
-
-    public void setScore(Short score) {
-        this.score = score;
-    }
-
-    public ZonedDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }

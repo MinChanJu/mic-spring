@@ -1,14 +1,29 @@
 package com.example.my_gradle_spring_app.model;
 
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+
 import java.time.ZonedDateTime;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "contests", uniqueConstraints = {
         @UniqueConstraint(name = "uk_contests_contest_name", columnNames = "contest_name")
 })
 public class Contest {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -33,68 +48,4 @@ public class Contest {
 
     @Column(name = "created_at", nullable = false)
     private ZonedDateTime createdAt = ZonedDateTime.now();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getContestName() {
-        return contestName;
-    }
-
-    public void setContestName(String contestName) {
-        this.contestName = contestName;
-    }
-
-    public String getContestDescription() {
-        return contestDescription;
-    }
-
-    public void setContestDescription(String contestDescription) {
-        this.contestDescription = contestDescription;
-    }
-
-    public String getContestPw() {
-        return contestPw;
-    }
-
-    public void setContestPw(String contestPw) {
-        this.contestPw = contestPw;
-    }
-
-    public Long getTime() {
-        return time;
-    }
-
-    public void setTime(Long time) {
-        this.time = time;
-    }
-
-    public ZonedDateTime getEventTime() {
-        return eventTime;
-    }
-
-    public void setEventTime(ZonedDateTime eventTime) {
-        this.eventTime = eventTime;
-    }
-
-    public ZonedDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }

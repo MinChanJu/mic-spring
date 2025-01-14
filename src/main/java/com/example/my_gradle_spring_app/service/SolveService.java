@@ -1,58 +1,79 @@
 package com.example.my_gradle_spring_app.service;
 
-import com.example.my_gradle_spring_app.model.Solve;
-import com.example.my_gradle_spring_app.repository.SolveRepository;
-
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.my_gradle_spring_app.exception.CustomException;
+import com.example.my_gradle_spring_app.exception.ErrorCode;
+import com.example.my_gradle_spring_app.model.Solve;
+import com.example.my_gradle_spring_app.repository.SolveRepository;
+
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class SolveService {
     
     @Autowired private SolveRepository solveRepository;
 
-    public List<Solve> getAllSolveds() {
+    public Solve getSolveByUserIdAndProblemId(String userId, Long problemId) {
+        Optional<Solve> solve = solveRepository.findByUserIdAndProblemId(userId, problemId);
+        if (solve.isEmpty()) throw new CustomException(ErrorCode.SOLVE_NOT_FOUND);
+
+        return solve.get();
+    }
+
+    public List<Solve> getAllSolves() {
         return solveRepository.findAll();
     }
 
-    public List<Solve> getSolvedsByUserId(String userId) {
+    public List<Solve> getAllSolvesByUserId(String userId) {
         return solveRepository.findByUserId(userId);
     }
 
-    public List<Solve> getSolvedsByProblemId(Long problemId) {
+    public List<Solve> getAllSolvesByProblemId(Long problemId) {
         return solveRepository.findByProblemId(problemId);
     }
 
-    public Solve getSolvedByUserIdAndProblemId(String userId, Long problemId) {
-        return solveRepository.findByUserIdAndProblemId(userId, problemId).orElse(null);
+    public Solve solveProblem(Solve solveDetail) {
+        Optional<Solve> solve = solveRepository.findByUserIdAndProblemId(solveDetail.getUserId(), solveDetail.getProblemId());
+        if (solve.isEmpty()) return solveRepository.save(solveDetail);
+
+        Solve findSolve = solve.get();
+        if (findSolve.getScore() > solveDetail.getScore()) return findSolve;
+
+        solveDetail.setId(findSolve.getId());
+        return solveRepository.save(solveDetail);
     }
 
-    public Solve createSolved(Solve solved) {
-        return solveRepository.save(solved);
+    public Solve createSolve(Solve solve) {
+        return solveRepository.save(solve);
     }
 
-    public Solve updateSolved(Solve solved) {
-        return solveRepository.save(solved);
+    public Solve updateSolve(Solve solve) {
+        if (!solveRepository.existsById(solve.getId())) throw new CustomException(ErrorCode.SOLVE_NOT_FOUND);
+
+        return solveRepository.save(solve);
     }
 
-    public void deleteSolved(Long id) {
-        Solve solved = solveRepository.findById(id).orElseThrow(() -> new RuntimeException("solved not found"));
-        solveRepository.delete(solved);
+    public void deleteSolve(Long id) {
+        Optional<Solve> solve = solveRepository.findById(id);
+        if (solve.isEmpty()) throw new CustomException(ErrorCode.SOLVE_NOT_FOUND);
+
+        solveRepository.delete(solve.get());
     }
 
-    public void deleteSolvedByProblemId(Long problemId) {
-        List<Solve> solveds = solveRepository.findByProblemId(problemId);
-        for (Solve solved : solveds) {
-            solveRepository.delete(solved);
+    public void deleteAllSolvesByProblemId(Long problemId) {
+        List<Solve> solves = solveRepository.findByProblemId(problemId);
+        for (Solve solve : solves) {
+            solveRepository.delete(solve);
         }
     }
 
-    public void deleteSolvedByUserId(String userId) {
-        List<Solve> solveds = solveRepository.findByUserId(userId);
-        for (Solve solved : solveds) {
-            solveRepository.delete(solved);
+    public void deleteAllSolvesByUserId(String userId) {
+        List<Solve> solves = solveRepository.findByUserId(userId);
+        for (Solve solve : solves) {
+            solveRepository.delete(solve);
         }
     }
 }

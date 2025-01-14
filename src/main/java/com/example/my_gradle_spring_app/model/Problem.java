@@ -1,14 +1,29 @@
 package com.example.my_gradle_spring_app.model;
 
-import jakarta.persistence.*;
+import lombok.AllArgsConstructor;
+import lombok.NoArgsConstructor;
+import lombok.Getter;
+import lombok.Setter;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.Table;
+import jakarta.persistence.UniqueConstraint;
+import jakarta.persistence.Id;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Column;
+
 import java.time.ZonedDateTime;
 
+@AllArgsConstructor
+@NoArgsConstructor
+@Getter
+@Setter
 @Entity
 @Table(name = "problems", uniqueConstraints = {
         @UniqueConstraint(name = "uk_problems_problem_name", columnNames = "problem_name")
 })
 public class Problem {
-
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
@@ -39,84 +54,4 @@ public class Problem {
 
     @Column(name = "created_at", nullable = false)
     private ZonedDateTime createdAt = ZonedDateTime.now();
-
-    public Long getId() {
-        return id;
-    }
-
-    public void setId(Long id) {
-        this.id = id;
-    }
-
-    public Long getContestId() {
-        return contestId;
-    }
-
-    public void setContestId(Long contestId) {
-        this.contestId = contestId;
-    }
-
-    public String getUserId() {
-        return userId;
-    }
-
-    public void setUserId(String userId) {
-        this.userId = userId;
-    }
-
-    public String getProblemName() {
-        return problemName;
-    }
-
-    public void setProblemName(String problemName) {
-        this.problemName = problemName;
-    }
-
-    public String getProblemDescription() {
-        return problemDescription;
-    }
-
-    public void setProblemDescription(String problemDescription) {
-        this.problemDescription = problemDescription;
-    }
-
-    public String getProblemInputDescription() {
-        return problemInputDescription;
-    }
-
-    public void setProblemInputDescription(String problemInputDescription) {
-        this.problemInputDescription = problemInputDescription;
-    }
-
-    public String getProblemOutputDescription() {
-        return problemOutputDescription;
-    }
-
-    public void setProblemOutputDescription(String problemOutputDescription) {
-        this.problemOutputDescription = problemOutputDescription;
-    }
-
-    public String getProblemExampleInput() {
-        return problemExampleInput;
-    }
-
-    public void setProblemExampleInput(String problemExampleInput) {
-        this.problemExampleInput = problemExampleInput;
-    }
-
-    public String getProblemExampleOutput() {
-        return problemExampleOutput;
-    }
-
-    public void setProblemExampleOutput(String problemExampleOutput) {
-        this.problemExampleOutput = problemExampleOutput;
-    }
-
-    public ZonedDateTime getCreatedAt() {
-        return createdAt;
-    }
-
-    public void setCreatedAt(ZonedDateTime createdAt) {
-        this.createdAt = createdAt;
-    }
 }

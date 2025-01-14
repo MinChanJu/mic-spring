@@ -1,15 +1,20 @@
 package com.example.my_gradle_spring_app.controller;
 
-import com.example.my_gradle_spring_app.model.Example;
-import com.example.my_gradle_spring_app.model.Problem;
-import com.example.my_gradle_spring_app.model.ProblemDTO;
-import com.example.my_gradle_spring_app.service.ExampleService;
-import com.example.my_gradle_spring_app.service.ProblemService;
-import com.example.my_gradle_spring_app.service.SolveService;
-
+import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.http.HttpStatus;
+
+import com.example.my_gradle_spring_app.dto.ApiResponse;
+import com.example.my_gradle_spring_app.dto.ProblemDTO;
+import com.example.my_gradle_spring_app.model.Problem;
+import com.example.my_gradle_spring_app.service.ProblemService;
 
 import java.util.List;
 
@@ -18,46 +23,39 @@ import java.util.List;
 public class ProblemController {
 
     @Autowired private ProblemService problemService;
-    @Autowired private ExampleService exampleService;
-    @Autowired private SolveService solvedService;
 
     @PostMapping
-    public List<Problem> getAllProblems() {
-        return problemService.getAllProblems();
+    public ResponseEntity<ApiResponse<List<Problem>>> getAllProblems() {
+        List<Problem> problems = problemService.getAllProblems();
+        ApiResponse<List<Problem>> response = new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/{id}")
-    public ResponseEntity<Problem> getProblemById(@PathVariable Long id) {
-        return problemService.getProblemById(id)
-                .map(ResponseEntity::ok)
-                .orElse(ResponseEntity.notFound().build());
+    public ResponseEntity<ApiResponse<Problem>> getProblemById(@PathVariable Long id) {
+        Problem problem = problemService.getProblemById(id);
+        ApiResponse<Problem> response = new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problem);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PostMapping("/create")
-    public Problem createProblem(@RequestBody ProblemDTO problem) {
-        Problem curProblem = problemService.createProblem(problem.getProblem());
-
-        for (Example example : problem.getExamples()) {
-            example.setProblemId(curProblem.getId());
-            exampleService.createExample(example);
-        }
-
-        return curProblem;
+    public ResponseEntity<ApiResponse<Problem>> createProblem(@RequestBody ProblemDTO problemDTO) {
+        Problem problem = problemService.createProblem(problemDTO);
+        ApiResponse<Problem> response = new ApiResponse<Problem>(200, true, "문제 생성 성공", problem);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @PutMapping("/update")
-    public ResponseEntity<Problem> updateProblem(@RequestBody ProblemDTO problem) {
-        for (Example example : problem.getExamples()) {
-            exampleService.updateExample(example);
-        }
-        return ResponseEntity.ok(problemService.updateProblem(problem.getProblem()));
+    public ResponseEntity<ApiResponse<Problem>> updateProblem(@RequestBody ProblemDTO problemDTO) {
+        Problem problem = problemService.updateProblem(problemDTO);
+        ApiResponse<Problem> response = new ApiResponse<Problem>(200, true, "문제 수정 성공", problem);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteProblem(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Object>> deleteProblem(@PathVariable Long id) {
         problemService.deleteProblem(id);
-        exampleService.deleteExampleByProblemId(id);
-        solvedService.deleteSolvedByProblemId(id);
-        return ResponseEntity.noContent().build();
+        ApiResponse<Object> response = new ApiResponse<Object>(200, true, "문제 삭제 성공", null);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }
