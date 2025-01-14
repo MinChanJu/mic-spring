@@ -1,7 +1,7 @@
 package com.example.my_gradle_spring_app.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
 @Table(name = "examples", schema = "public" )
@@ -14,21 +14,14 @@ public class Example {
     @Column(name = "problem_id", nullable = false)
     private Long problemId;
 
-    @Column(name = "example_input", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "example_input", nullable = false)
     private String ExampleInput;
 
-    @Column(name = "example_output", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "example_output", nullable = false)
     private String ExampleOutput;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    // Getters and Setters
+    @Column(name = "created_at", nullable = false)
+    private ZonedDateTime createdAt = ZonedDateTime.now();
     
     public Long getId() {
         return id;
@@ -62,11 +55,11 @@ public class Example {
         ExampleOutput = exampleOutput;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 }

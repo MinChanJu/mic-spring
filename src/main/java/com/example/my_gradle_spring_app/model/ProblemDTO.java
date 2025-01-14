@@ -6,8 +6,6 @@ public class ProblemDTO {
     private Problem problem;
     private List<Example> examples;
 
-    // Getters and Setters
-
     public Problem getProblem() {
         return problem;
     }

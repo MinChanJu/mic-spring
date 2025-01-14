@@ -1,11 +1,13 @@
 package com.example.my_gradle_spring_app.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "solveds", schema = "public" )
-public class Solved {
+@Table(name = "solves", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_solves_multi_user_id_problem_id", columnNames = { "user_id", "problem_id" })
+})
+public class Solve {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
@@ -18,53 +20,48 @@ public class Solved {
     private Long problemId;
 
     @Column(name = "score", nullable = false)
-    private String score;
+    private Short score;
 
     @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt = ZonedDateTime.now();
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
+    public Long getId() {
+        return id;
     }
 
     public void setId(Long id) {
         this.id = id;
     }
 
-    public Long getId() {
-        return id;
+    public String getUserId() {
+        return userId;
     }
 
     public void setUserId(String userId) {
         this.userId = userId;
     }
 
-    public String getUserId() {
-        return userId;
+    public Long getProblemId() {
+        return problemId;
     }
 
     public void setProblemId(Long problemId) {
         this.problemId = problemId;
     }
 
-    public Long getProblemId() {
-        return problemId;
-    }
-
-    public String getScore() {
+    public Short getScore() {
         return score;
     }
 
-    public void setScore(String score) {
+    public void setScore(Short score) {
         this.score = score;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public ZonedDateTime getCreatedAt() {
+        return createdAt;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public void setCreatedAt(ZonedDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }

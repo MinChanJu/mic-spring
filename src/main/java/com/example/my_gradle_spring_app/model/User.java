@@ -1,11 +1,12 @@
 package com.example.my_gradle_spring_app.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+
+import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "users", schema = "public", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "user_id")
+@Table(name = "users", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_users_user_id", columnNames = "user_id")
 })
 public class User {
 
@@ -13,16 +14,16 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false, length = 100)
+    @Column(name = "name", nullable = false)
     private String name;
 
-    @Column(name = "user_id", nullable = false, length = 255, unique = true)
+    @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "user_pw", nullable = false, length = 255)
+    @Column(name = "user_pw", nullable = false)
     private String userPw;
 
-    @Column(name = "phone", nullable = false, length = 100)
+    @Column(name = "phone", nullable = false)
     private String phone;
 
     @Column(name = "email", nullable = false)
@@ -31,18 +32,11 @@ public class User {
     @Column(name = "authority", nullable = false)
     private Long authority;
 
-    @Column(name = "contest", nullable = false)
-    private Long contest;
+    @Column(name = "contest_id", nullable = false)
+    private Long contestId;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    // Getters and Setters
+    @Column(name = "created_at", nullable = false)
+    private ZonedDateTime createdAt = ZonedDateTime.now();
 
     public Long getId() {
         return id;
@@ -100,19 +94,19 @@ public class User {
         this.authority = authority;
     }
 
-    public Long getContest() {
-        return contest;
+    public Long getContestId() {
+        return contestId;
     }
 
-    public void setContest(Long contest) {
-        this.contest = contest;
+    public void setContestId(Long contestId) {
+        this.contestId = contestId;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 }

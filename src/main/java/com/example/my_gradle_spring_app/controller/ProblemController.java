@@ -5,7 +5,7 @@ import com.example.my_gradle_spring_app.model.Problem;
 import com.example.my_gradle_spring_app.model.ProblemDTO;
 import com.example.my_gradle_spring_app.service.ExampleService;
 import com.example.my_gradle_spring_app.service.ProblemService;
-import com.example.my_gradle_spring_app.service.SolvedService;
+import com.example.my_gradle_spring_app.service.SolveService;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -19,7 +19,7 @@ public class ProblemController {
 
     @Autowired private ProblemService problemService;
     @Autowired private ExampleService exampleService;
-    @Autowired private SolvedService solvedService;
+    @Autowired private SolveService solvedService;
 
     @PostMapping
     public List<Problem> getAllProblems() {

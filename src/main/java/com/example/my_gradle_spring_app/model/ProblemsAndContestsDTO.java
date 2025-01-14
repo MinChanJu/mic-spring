@@ -11,7 +11,6 @@ public class ProblemsAndContestsDTO {
         this.contests = contests;
     }
     
-    // Getters and setters
     public List<Problem> getProblems() {
         return problems;
     }

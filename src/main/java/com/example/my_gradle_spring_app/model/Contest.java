@@ -1,12 +1,11 @@
 package com.example.my_gradle_spring_app.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
-import java.time.OffsetDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "contests", schema = "public", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "contest_name")
+@Table(name = "contests", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_contests_contest_name", columnNames = "contest_name")
 })
 public class Contest {
 
@@ -14,33 +13,26 @@ public class Contest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false, length = 255)
+    @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "contest_name", nullable = false, length = 100, unique = true)
+    @Column(name = "contest_name", nullable = false)
     private String contestName;
 
-    @Column(name = "contest_description", length = 100)
+    @Column(name = "contest_description", nullable = false)
     private String contestDescription;
 
-    @Column(name = "contest_pw", length = 255)
+    @Column(name = "contest_pw", nullable = false)
     private String contestPw;
-
-    @Column(name = "event_time", nullable = false)
-    private OffsetDateTime eventTime;
 
     @Column(name = "time", nullable = false)
     private Long time;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
+    @Column(name = "event_time", nullable = false)
+    private ZonedDateTime eventTime;
 
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    // Getters and Setters
+    @Column(name = "created_at", nullable = false)
+    private ZonedDateTime createdAt = ZonedDateTime.now();
 
     public Long getId() {
         return id;
@@ -82,14 +74,6 @@ public class Contest {
         this.contestPw = contestPw;
     }
 
-    public OffsetDateTime getEventTime() {
-        return eventTime;
-    }
-
-    public void setEventTime(OffsetDateTime eventTime) {
-        this.eventTime = eventTime;
-    }
-
     public Long getTime() {
         return time;
     }
@@ -98,11 +82,19 @@ public class Contest {
         this.time = time;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public ZonedDateTime getEventTime() {
+        return eventTime;
+    }
+
+    public void setEventTime(ZonedDateTime eventTime) {
+        this.eventTime = eventTime;
+    }
+
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 }

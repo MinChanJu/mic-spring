@@ -5,7 +5,6 @@ public class CodeDTO {
     private String lang;
     private Long problemId;
 
-    // Getters and Setters
     public String getCode() {
         return code;
     }
