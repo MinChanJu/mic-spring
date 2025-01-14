@@ -12,8 +12,7 @@ import java.util.Optional;
 @Service
 public class ProblemService {
 
-    @Autowired
-    private ProblemRepository problemRepository;
+    @Autowired private ProblemRepository problemRepository;
 
     public List<Problem> getAllProblems() {
         return problemRepository.findAll();

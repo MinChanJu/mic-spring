@@ -1,6 +1,6 @@
 package com.example.my_gradle_spring_app.model;
 
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 public class UserDTO {
     private Long id;
@@ -8,14 +8,9 @@ public class UserDTO {
     private String userId;
     private String email;
     private Long authority;
-    private LocalDateTime createdAt;
+    private ZonedDateTime createdAt;
 
-    // 기본 생성자 (필수는 아니지만, 필요할 수 있음)
-    public UserDTO() {
-    }
-
-    // 모든 필드를 매개변수로 받는 생성자
-    public UserDTO(Long id, String name, String userId, String email, Long authority, LocalDateTime createdAt) {
+    public UserDTO(Long id, String name, String userId, String email, Long authority, ZonedDateTime createdAt) {
         this.id = id;
         this.name = name;
         this.userId = userId;
@@ -24,7 +19,6 @@ public class UserDTO {
         this.createdAt = createdAt;
     }
 
-    // 게터와 세터 (Getter and Setter)
     public Long getId() {
         return id;
     }
@@ -65,11 +59,11 @@ public class UserDTO {
         this.authority = authority;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 }

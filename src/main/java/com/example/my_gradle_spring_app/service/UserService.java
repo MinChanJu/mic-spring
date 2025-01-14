@@ -32,8 +32,8 @@ public class UserService {
         return userRepository.findById(id);
     }
 
-    public List<User> getUserByContest(Long contest) {
-        return userRepository.findByContest(contest);
+    public List<User> getUserByContestId(Long contestId) {
+        return userRepository.findByContestId(contestId);
     }
 
     public User getUserByUserId(String userId) {

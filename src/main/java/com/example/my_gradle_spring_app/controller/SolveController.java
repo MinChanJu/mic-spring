@@ -9,21 +9,21 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.example.my_gradle_spring_app.model.Solved;
-import com.example.my_gradle_spring_app.service.SolvedService;
+import com.example.my_gradle_spring_app.model.Solve;
+import com.example.my_gradle_spring_app.service.SolveService;
 
 @RestController
-@RequestMapping("/api/solveds")
-public class SolvedController {
+@RequestMapping("/api/solves")
+public class SolveController {
     
-    @Autowired private SolvedService solvedService;
+    @Autowired private SolveService solvedService;
 
     @PostMapping
-    public Solved solvedProblem(@RequestBody Solved solved) {
-        Solved findSolved = solvedService.getSolvedByUserIdAndProblemId(solved.getUserId(), solved.getProblemId());
+    public Solve solvedProblem(@RequestBody Solve solved) {
+        Solve findSolved = solvedService.getSolvedByUserIdAndProblemId(solved.getUserId(), solved.getProblemId());
 
         if (findSolved != null) {
-            if (Float.parseFloat(findSolved.getScore()) > Float.parseFloat(solved.getScore())) return findSolved;
+            if (findSolved.getScore() > solved.getScore()) return findSolved;
             solved.setId(findSolved.getId());
             return solvedService.updateSolved(solved);
         }
@@ -31,12 +31,12 @@ public class SolvedController {
     }
     
     @PostMapping("/{userId}")
-    public List<Solved> getSolvedOfUser(@PathVariable String userId) {
+    public List<Solve> getSolvedOfUser(@PathVariable String userId) {
         return solvedService.getSolvedsByUserId(userId);
     }
 
     @PostMapping("/problem/{problemId}")
-    public List<Solved> getSolvedOfUser(@PathVariable Long problemId) {
+    public List<Solve> getSolvedOfUser(@PathVariable Long problemId) {
         return solvedService.getSolvedsByProblemId(problemId);
     }
 }

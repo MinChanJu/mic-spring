@@ -2,9 +2,9 @@ package com.example.my_gradle_spring_app.model;
 
 public class Submit {
     private Long problemId;
-    private String score;
+    private Short score;
 
-    public Submit(Long problemId, String score) {
+    public Submit(Long problemId, Short score) {
         this.problemId = problemId;
         this.score = score;
     }
@@ -17,11 +17,11 @@ public class Submit {
         this.problemId = problemId;
     }
 
-    public String getScore() {
+    public Short getScore() {
         return score;
     }
 
-    public void setScore(String score) {
+    public void setScore(Short score) {
         this.score = score;
     }
 }

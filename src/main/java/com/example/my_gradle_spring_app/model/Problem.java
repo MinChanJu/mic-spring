@@ -1,11 +1,11 @@
 package com.example.my_gradle_spring_app.model;
 
 import jakarta.persistence.*;
-import java.time.LocalDateTime;
+import java.time.ZonedDateTime;
 
 @Entity
-@Table(name = "problems", schema = "public", uniqueConstraints = {
-    @UniqueConstraint(columnNames = "problem_name")
+@Table(name = "problems", uniqueConstraints = {
+        @UniqueConstraint(name = "uk_problems_problem_name", columnNames = "problem_name")
 })
 public class Problem {
 
@@ -16,36 +16,29 @@ public class Problem {
     @Column(name = "contest_id")
     private Long contestId;
 
-    @Column(name = "user_id", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "user_id", nullable = false)
     private String userId;
 
-    @Column(name = "problem_name", nullable = false, length = 100, unique = true)
+    @Column(name = "problem_name", nullable = false)
     private String problemName;
 
-    @Column(name = "problem_description", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "problem_description", nullable = false)
     private String problemDescription;
 
-    @Column(name = "problem_input_description", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "problem_input_description", nullable = false)
     private String problemInputDescription;
 
-    @Column(name = "problem_output_description", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "problem_output_description", nullable = false)
     private String problemOutputDescription;
 
-    @Column(name = "problem_example_input", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "problem_example_input", nullable = false)
     private String problemExampleInput;
 
-    @Column(name = "problem_example_output", nullable = false, columnDefinition = "TEXT")
+    @Column(name = "problem_example_output", nullable = false)
     private String problemExampleOutput;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    protected void onCreate() {
-        this.createdAt = LocalDateTime.now();
-    }
-
-    // Getters and Setters
+    @Column(name = "created_at", nullable = false)
+    private ZonedDateTime createdAt = ZonedDateTime.now();
 
     public Long getId() {
         return id;
@@ -119,11 +112,11 @@ public class Problem {
         this.problemExampleOutput = problemExampleOutput;
     }
 
-    public LocalDateTime getCreatedAt() {
+    public ZonedDateTime getCreatedAt() {
         return createdAt;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
+    public void setCreatedAt(ZonedDateTime createdAt) {
         this.createdAt = createdAt;
     }
 }
