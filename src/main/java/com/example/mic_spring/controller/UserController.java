@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.mic_spring.domain.dto.ApiResponse;
 import com.example.mic_spring.domain.dto.UserDTO;
+import com.example.mic_spring.domain.dto.UserLoginDTO;
 import com.example.mic_spring.domain.entity.User;
 import com.example.mic_spring.service.UserService;
 
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,23 +28,23 @@ public class UserController {
 
     @Autowired private UserService userService;
 
-    @PostMapping
+    @GetMapping
     public ResponseEntity<ApiResponse<List<User>>> getAllUsers() {
         List<User> users = userService.getAllUsers();
         ApiResponse<List<User>> response = new ApiResponse<>(200, true, "모든 회원 조회 성공", users);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/{userId}")
-    public ResponseEntity<ApiResponse<UserDTO>> getUserDTOByUserId(@PathVariable String userId) {
+    @GetMapping("/{userId}")
+    public ResponseEntity<ApiResponse<UserDTO>> getUserDTOByUserId(@PathVariable("userId") String userId) {
         UserDTO userDTO = userService.getUserByUserId(userId);
         ApiResponse<UserDTO> response = new ApiResponse<>(200, true, "회원 아이디로 조회 성공", userDTO);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
-    @PostMapping("/{userId}/{userPw}")
-    public ResponseEntity<ApiResponse<User>> getUserByUserId(@PathVariable String userId, @PathVariable String userPw) {
-        User user = userService.getUserByUserIdAndUserPw(userId, userPw);
+    @PostMapping("/login")
+    public ResponseEntity<ApiResponse<User>> getUserByUserIdAndUserPw(@RequestBody UserLoginDTO userLoginDTO) {
+        User user = userService.getUserByUserIdAndUserPw(userLoginDTO);
         ApiResponse<User> response = new ApiResponse<>(200, true, "로그인 성공", user);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
@@ -62,7 +64,7 @@ public class UserController {
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable Long id) {
+    public ResponseEntity<ApiResponse<Void>> deleteUser(@PathVariable("id") Long id) {
         userService.deleteUser(id);
         ApiResponse<Void> response = new ApiResponse<>(200, true, "회원 삭제 성공", null);
         return ResponseEntity.status(HttpStatus.OK).body(response);

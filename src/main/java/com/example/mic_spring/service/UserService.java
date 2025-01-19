@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.mic_spring.domain.dto.UserDTO;
+import com.example.mic_spring.domain.dto.UserLoginDTO;
 import com.example.mic_spring.domain.entity.User;
 import com.example.mic_spring.exception.CustomException;
 import com.example.mic_spring.exception.ErrorCode;
@@ -33,7 +34,8 @@ public class UserService {
         return userDTO;
     }
 
-    public User getUserByUserIdAndUserPw(String userId, String userPw) {
+    public User getUserByUserIdAndUserPw(UserLoginDTO userLoginDTO) {
+        String userId = userLoginDTO.getUserId(), userPw = userLoginDTO.getUserPw();
         Optional<User> user = userRepository.findByUserIdAndUserPw(userId, userPw);
         if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
 

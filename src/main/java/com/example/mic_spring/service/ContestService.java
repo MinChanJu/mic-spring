@@ -10,7 +10,6 @@ import com.example.mic_spring.repository.ContestRepository;
 
 import java.util.List;
 import java.util.Optional;
-import java.time.ZonedDateTime;
 
 @Service
 public class ContestService {
@@ -25,16 +24,19 @@ public class ContestService {
         return contest.get();
     }
 
+    public List<Contest> getAllContestsByUserId(String userId) {
+        return contestRepository.findByUserId(userId);
+    }
+
     public List<Contest> getAllContests() {
-        return contestRepository.findAll();
-    }
-
-    public List<Contest> getAllContestsBefore() {
-        return contestRepository.findByEventTimeBefore(ZonedDateTime.now());
-    }
-
-    public List<Contest> getAllContestsAfter() {
-        return contestRepository.findByEventTimeAfter(ZonedDateTime.now());
+        List<Contest> contests = contestRepository.findAll();
+        contests.sort((a, b) -> {
+            if (a.getStartTime() == null && b.getStartTime() == null) return a.getCreatedAt().isBefore(b.getCreatedAt()) ? 1 : -1;
+            else if (a.getStartTime() == null) return 1;
+            else if (b.getStartTime() == null) return -1;
+            return a.getStartTime().isBefore(b.getStartTime()) ? 1 : -1;
+        });
+        return contests;
     }
 
     public Contest createContest(Contest contest) {

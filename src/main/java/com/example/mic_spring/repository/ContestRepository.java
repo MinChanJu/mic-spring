@@ -6,11 +6,9 @@ import org.springframework.stereotype.Repository;
 import com.example.mic_spring.domain.entity.Contest;
 
 import java.util.List;
-import java.time.ZonedDateTime;
 
 @Repository
 public interface ContestRepository extends JpaRepository<Contest, Long> {
-    List<Contest> findByEventTimeBefore(ZonedDateTime currentTime);
-    List<Contest> findByEventTimeAfter(ZonedDateTime currentTime);
+    List<Contest> findByUserId(String userId);
     boolean existsByContestName(String contestName);
 }

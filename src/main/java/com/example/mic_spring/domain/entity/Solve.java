@@ -37,6 +37,12 @@ public class Solve {
     @Column(name = "score", nullable = false)
     private Short score;
 
-    @Column(name = "created_at", nullable = false, updatable = false)
+    @Column(name = "lang", nullable = false)
+    private String lang;
+
+    @Column(name = "code", nullable = false)
+    private String code;
+
+    @Column(name = "created_at", nullable = false)
     private ZonedDateTime createdAt = ZonedDateTime.now();
 }

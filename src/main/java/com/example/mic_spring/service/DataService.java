@@ -12,6 +12,7 @@ import com.example.mic_spring.domain.entity.Solve;
 import com.example.mic_spring.domain.entity.User;
 
 import java.util.List;
+import java.time.ZonedDateTime;
 import java.util.ArrayList;
 
 @Service
@@ -45,5 +46,19 @@ public class DataService {
         }
 
         return contestScores;
+    }
+
+    public ContestsAndProblemsDTO getAllFilterContestsAndProblems() {
+        List<Contest> contests = contestService.getAllContests();
+        List<Problem> problems = problemService.getAllProblems().stream()
+        .filter(problem -> {
+            if (problem.getContestId() == null) return true;
+            Contest contest = contestService.getContestById(problem.getContestId());
+            if (contest.getEndTime() == null) return true;
+            if (contest.getEndTime().isBefore(ZonedDateTime.now())) return true;
+            return false;
+        }).toList();
+        ContestsAndProblemsDTO contestsAndProblems = new ContestsAndProblemsDTO(contests, problems);
+        return contestsAndProblems;
     }
 }

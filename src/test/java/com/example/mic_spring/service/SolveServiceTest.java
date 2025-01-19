@@ -43,9 +43,9 @@ public class SolveServiceTest {
 
     @Test
     void create() {
-        Solve solve1 = new Solve(null, "test1", 1L, (short) 200, ZonedDateTime.now());
-        Solve solve2 = new Solve(null, "test1", 1L, (short) 100, ZonedDateTime.now());
-        Solve solve3 = new Solve(null, "test1", 1L, (short) 800, ZonedDateTime.now());
+        Solve solve1 = new Solve(null, "test1", 1L, (short) 200, "Python", "print(\"Hello\")", ZonedDateTime.now());
+        Solve solve2 = new Solve(null, "test1", 1L, (short) 100, "Python", "print(\"Hello\")", ZonedDateTime.now());
+        Solve solve3 = new Solve(null, "test1", 1L, (short) 800, "Python", "print(\"Hello\")", ZonedDateTime.now());
 
         Solve find1 = solveService.solveProblem(solve1);
         Solve find2 = solveService.solveProblem(solve2);
@@ -62,11 +62,11 @@ public class SolveServiceTest {
         int size2 = solveService.getAllSolvesByUserId("test1").size();
         int size3 = solveService.getAllSolvesByProblemId(2L).size();
 
-        Solve solve1 = new Solve(null, "test1", 1L, (short) 200, ZonedDateTime.now());
-        Solve solve2 = new Solve(null, "test1", 2L, (short) 340, ZonedDateTime.now());
-        Solve solve3 = new Solve(null, "test2", 2L, (short) 700, ZonedDateTime.now());
-        Solve solve4 = new Solve(null, "test2", 1L, (short) 100, ZonedDateTime.now());
-        Solve solve5 = new Solve(null, "test1", 1L, (short) 800, ZonedDateTime.now());
+        Solve solve1 = new Solve(null, "test1", 1L, (short) 200, "Python", "print(\"Hello\")", ZonedDateTime.now());
+        Solve solve2 = new Solve(null, "test1", 2L, (short) 340, "Python", "print(\"Hello\")", ZonedDateTime.now());
+        Solve solve3 = new Solve(null, "test2", 2L, (short) 700, "Python", "print(\"Hello\")", ZonedDateTime.now());
+        Solve solve4 = new Solve(null, "test2", 1L, (short) 100, "Python", "print(\"Hello\")", ZonedDateTime.now());
+        Solve solve5 = new Solve(null, "test1", 1L, (short) 800, "Python", "print(\"Hello\")", ZonedDateTime.now());
 
         solveService.solveProblem(solve1);
         solveService.solveProblem(solve2);
@@ -91,11 +91,11 @@ public class SolveServiceTest {
 
     @Test
     void delete() {
-        Solve solve1 = new Solve(null, "test1", 1L, (short) 200, ZonedDateTime.now());
-        Solve solve2 = new Solve(null, "test1", 2L, (short) 340, ZonedDateTime.now());
-        Solve solve3 = new Solve(null, "test2", 2L, (short) 700, ZonedDateTime.now());
-        Solve solve4 = new Solve(null, "test2", 1L, (short) 100, ZonedDateTime.now());
-        Solve solve5 = new Solve(null, "test1", 1L, (short) 800, ZonedDateTime.now());
+        Solve solve1 = new Solve(null, "test1", 1L, (short) 200, "Python", "print(\"Hello\")", ZonedDateTime.now());
+        Solve solve2 = new Solve(null, "test1", 2L, (short) 340, "Python", "print(\"Hello\")", ZonedDateTime.now());
+        Solve solve3 = new Solve(null, "test2", 2L, (short) 700, "Python", "print(\"Hello\")", ZonedDateTime.now());
+        Solve solve4 = new Solve(null, "test2", 1L, (short) 100, "Python", "print(\"Hello\")", ZonedDateTime.now());
+        Solve solve5 = new Solve(null, "test1", 1L, (short) 800, "Python", "print(\"Hello\")", ZonedDateTime.now());
 
         solveService.solveProblem(solve1);
         solveService.solveProblem(solve2);

@@ -8,6 +8,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.mic_spring.domain.dto.UserDTO;
+import com.example.mic_spring.domain.dto.UserLoginDTO;
 import com.example.mic_spring.domain.entity.User;
 import com.example.mic_spring.exception.CustomException;
 import com.example.mic_spring.exception.ErrorCode;
@@ -102,7 +103,7 @@ public class UserServiceTest {
 
         User find1 = userService.getUserById(user1.getId());
         UserDTO find2 = userService.getUserByUserId("test22");
-        User find3 = userService.getUserByUserIdAndUserPw("test33", "test3333");
+        User find3 = userService.getUserByUserIdAndUserPw(new UserLoginDTO("test33", "test3333"));
         List<User> find4 = userService.getAllUsers();
         List<User> find5 = userService.getAllUsersByContestId(3L);
 
@@ -121,7 +122,7 @@ public class UserServiceTest {
         assertThatThrownBy(() -> userService.getUserByUserId("null"))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
-        assertThatThrownBy(() -> userService.getUserByUserIdAndUserPw("null", "null"))
+        assertThatThrownBy(() -> userService.getUserByUserIdAndUserPw(new UserLoginDTO("null", "null")))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.USER_NOT_FOUND.getMessage());
         assertThatThrownBy(() -> userService.getAllUsersByContestId(null))

@@ -4,12 +4,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.mic_spring.domain.dto.ProblemDTO;
+import com.example.mic_spring.domain.dto.ProblemScoreDTO;
 import com.example.mic_spring.domain.entity.Example;
 import com.example.mic_spring.domain.entity.Problem;
+import com.example.mic_spring.domain.entity.Solve;
 import com.example.mic_spring.exception.CustomException;
 import com.example.mic_spring.exception.ErrorCode;
 import com.example.mic_spring.repository.ProblemRepository;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,6 +21,7 @@ public class ProblemService {
 
     @Autowired private ProblemRepository problemRepository;
     @Autowired private ExampleService exampleService;
+    @Autowired private SolveService solveService;
 
     public Problem getProblemById(Long id) {
         if (id == null) throw new CustomException(ErrorCode.PROBLEM_NOT_FOUND);
@@ -33,6 +37,20 @@ public class ProblemService {
 
     public List<Problem> getAllProblemsByContestId(Long contestId) {
         return problemRepository.findByContestId(contestId);
+    }
+
+    public List<Problem> getAllProblemsByUserId(String userId) {
+        return problemRepository.findByUserId(userId);
+    }
+
+    public List<ProblemScoreDTO> getAllSolveProblemsByUserId(String userId) {
+        List<Solve> solves = solveService.getAllSolvesByUserId(userId);
+        List<ProblemScoreDTO> problemScores = new ArrayList<>();
+        for (Solve solve : solves) {
+            Problem problem = getProblemById(solve.getProblemId());
+            problemScores.add(new ProblemScoreDTO(problem, solve.getScore()));
+        }
+        return problemScores;
     }
 
     public Problem createProblem(ProblemDTO problemDTO) {
@@ -59,7 +77,8 @@ public class ProblemService {
         if (!problemRepository.existsById(problem.getId())) throw new CustomException(ErrorCode.PROBLEM_NOT_FOUND);
 
         for (Example example : examples) {
-            exampleService.updateExample(example);
+            if (example.getId() == null) exampleService.createExample(example);
+            else exampleService.updateExample(example);
         }
         
         return problemRepository.save(problem);

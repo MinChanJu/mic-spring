@@ -37,14 +37,14 @@ public class Contest {
     @Column(name = "contest_description", nullable = false)
     private String contestDescription;
 
-    @Column(name = "contest_pw", nullable = false)
+    @Column(name = "contest_pw")
     private String contestPw;
 
-    @Column(name = "time", nullable = false)
-    private Long time;
+    @Column(name = "start_time")
+    private ZonedDateTime startTime;
 
-    @Column(name = "event_time", nullable = false)
-    private ZonedDateTime eventTime;
+    @Column(name = "end_time")
+    private ZonedDateTime endTime;
 
     @Column(name = "created_at", nullable = false)
     private ZonedDateTime createdAt = ZonedDateTime.now();

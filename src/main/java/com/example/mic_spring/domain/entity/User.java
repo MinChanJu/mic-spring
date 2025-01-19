@@ -46,7 +46,7 @@ public class User {
     @Column(name = "authority", nullable = false)
     private Long authority;
 
-    @Column(name = "contest_id", nullable = false)
+    @Column(name = "contest_id")
     private Long contestId;
 
     @Column(name = "created_at", nullable = false)

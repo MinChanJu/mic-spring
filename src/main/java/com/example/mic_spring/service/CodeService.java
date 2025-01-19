@@ -54,6 +54,14 @@ public class CodeService {
         Problem problem = problemService.getProblemById(codeDTO.getProblemId());
         List<Example> examples = exampleService.getAllExamplesByProblemId(codeDTO.getProblemId());
 
+        String result = runCode(code, lang, problem, examples);
+
+        return result;
+    }
+
+    public String runCode(String code, String lang, Problem problem, List<Example> examples) {
+        
+
         int total = examples.size() + 1;
         int count = 0;
 

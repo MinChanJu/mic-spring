@@ -18,7 +18,7 @@ public class CodeServiceTest {
 
     @Test
     void code() {
-        CodeDTO codeDTO = new CodeDTO("print('Hello')", "Python", 2L);
+        CodeDTO codeDTO = new CodeDTO("test", "print('Hello')", "Python", 2L);
 
         String result1 = codeService.runCode(codeDTO);
 
