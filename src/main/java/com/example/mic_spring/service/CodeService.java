@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.mic_spring.domain.dto.CodeDTO;
+import com.example.mic_spring.domain.dto.CodeResultDTO;
 import com.example.mic_spring.domain.entity.Example;
 import com.example.mic_spring.domain.entity.Problem;
+import com.example.mic_spring.domain.entity.Solve;
 
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.JavaFileObject;
@@ -29,7 +31,7 @@ import java.io.IOException;
 import java.io.FileWriter;
 import java.io.File;
 import java.net.URI;
-
+import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Map;
 import java.util.Arrays;
@@ -47,121 +49,210 @@ public class CodeService {
 
     @Autowired private ProblemService problemService;
     @Autowired private ExampleService exampleService;
+    @Autowired private SolveService solveService;
 
-    public String runCode(CodeDTO codeDTO) {
+    public CodeResultDTO runCode(CodeDTO codeDTO) {
+        String userId = codeDTO.getUserId();
         String code = codeDTO.getCode();
         String lang = codeDTO.getLang();
-        Problem problem = problemService.getProblemById(codeDTO.getProblemId());
-        List<Example> examples = exampleService.getAllExamplesByProblemId(codeDTO.getProblemId());
+        Long problemId = codeDTO.getProblemId();
+        Problem problem = problemService.getProblemById(problemId);
+        List<Example> examples = exampleService.getAllExamplesByProblemId(problemId);
 
         String result = runCode(code, lang, problem, examples);
 
-        return result;
+        Solve solve = new Solve(null, userId, problemId, (short) 0, lang, code, ZonedDateTime.now());
+        if (result.matches("[+-]?\\d*(\\.\\d+)?")) solve.setScore((short) (Double.parseDouble(result)*10));
+
+        solveService.solveProblem(solve);
+
+        List<Solve> solves = solveService.getAllSolvesByUserId(userId);
+
+        return new CodeResultDTO(result, solves);
+    }
+
+    @FunctionalInterface
+    public interface TriFunction<T, U, V, R> {
+        R apply(T t, U u, V v);
     }
 
     public String runCode(String code, String lang, Problem problem, List<Example> examples) {
-        
-
         int total = examples.size() + 1;
         int count = 0;
-
-        if (lang.equals("Python")) {
-            String result;
+    
+        TriFunction<String, String, String, String> compiler = getCompiler(lang);
+        if (compiler == null) return "제출 오류";
+    
+        try {
+            if (processExample(compiler, code, problem.getProblemExampleInput(), problem.getProblemExampleOutput())) {
+                count++;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "서버 에러: " + e.getMessage();
+        }
+    
+        for (Example example : examples) {
             try {
-                result = pythonCompile(code, problem.getProblemExampleInput(), problem.getProblemExampleOutput());
-                if (result.equals("success")) {
+                if (processExample(compiler, code, example.getExampleInput(), example.getExampleOutput())) {
                     count++;
-                } else if (result.equals("process run fail: Timeout")) {
-                    return "시간초과";
-                } else if (!result.equals("fail")) {
-                    return result;
                 }
             } catch (Exception e) {
-                e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력하여 문제를 진단
+                e.printStackTrace();
                 return "서버 에러: " + e.getMessage();
             }
-            for (Example example : examples) {
+        }
+        return String.format("%.1f", ((double) count / (double) total) * 100);
+    }
+    
+    private TriFunction<String, String, String, String> getCompiler(String lang) {
+        switch (lang) {
+            case "Python": return (code, input, output) -> {
                 try {
-                    result = pythonCompile(code, example.getExampleInput(), example.getExampleOutput());
-                    if (result.equals("success")) {
-                        count++;
-                    } else if (result.equals("process run fail: Timeout")) {
-                        return "시간초과";
-                    } else if (!result.equals("fail")) {
-                        return result;
-                    }
+                    return pythonCompile(code, input, output);
                 } catch (Exception e) {
-                    e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력하여 문제를 진단
-                    return "서버 에러: " + e.getMessage();
+                    e.printStackTrace();
+                    throw new RuntimeException(e.getMessage());
                 }
-            }
-            return String.format("%.1f", ((double) count / (double) total) * 100);
-        } else if (lang.equals("C")) {
-            String result;
-            try {
-                result = ClanguageCompile(code, problem.getProblemExampleInput(), problem.getProblemExampleOutput());
-                if (result.equals("success")) {
-                    count++;
-                } else if (result.equals("process run fail: Timeout")) {
-                    return "시간초과";
-                } else if (!result.equals("fail")) {
-                    return result;
-                }
-            } catch (Exception e) {
-                e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력하여 문제를 진단
-                return "서버 에러: " + e.getMessage();
-            }
-            for (Example example : examples) {
+            };
+            case "C": return (code, input, output) -> {
                 try {
-                    result = ClanguageCompile(code, example.getExampleInput(), example.getExampleOutput());
-                    if (result.equals("success")) {
-                        count++;
-                    } else if (result.equals("process run fail: Timeout")) {
-                        return "시간초과";
-                    } else if (!result.equals("fail")) {
-                        return result;
-                    }
+                    return ClanguageCompile(code, input, output);
                 } catch (Exception e) {
-                    e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력하여 문제를 진단
-                    return "서버 에러: " + e.getMessage();
+                    e.printStackTrace();
+                    throw new RuntimeException(e.getMessage());
                 }
-            }
-            return String.format("%.1f", ((double) count / (double) total) * 100);
-        } else if (lang.equals("JAVA")) {
-            String result;
-            try {
-                result = javaCompile(code, problem.getProblemExampleInput(), problem.getProblemExampleOutput());
-                if (result.equals("success")) {
-                    count++;
-                } else if (result.equals("process run fail: Timeout")) {
-                    return "시간초과";
-                } else if (!result.equals("fail")) {
-                    return result;
-                }
-            } catch (Exception e) {
-                e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력하여 문제를 진단
-                return "서버 에러: " + e.getMessage();
-            }
-            for (Example example : examples) {
+            };
+            case "JAVA": return (code, input, output) -> {
                 try {
-                    result = javaCompile(code, example.getExampleInput(), example.getExampleOutput());
-                    if (result.equals("success")) {
-                        count++;
-                    } else if (result.equals("process run fail: Timeout")) {
-                        return "시간초과";
-                    } else if (!result.equals("fail")) {
-                        return result;
-                    }
+                    return javaCompile(code, input, output);
                 } catch (Exception e) {
-                    e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력하여 문제를 진단
-                    return "서버 에러: " + e.getMessage();
+                    e.printStackTrace();
+                    throw new RuntimeException(e.getMessage());
                 }
-            }
-            return String.format("%.1f", ((double) count / (double) total) * 100);
-        } else {
-            return "제출 오류";
+            };
+            default: return null;
         }
     }
+    
+    private boolean processExample(TriFunction<String, String, String, String>compiler, String code, String input, String output) throws Exception {
+        String result = compiler.apply(code, input, output);
+        if (result.equals("success")) {
+            return true;
+        } else if (result.equals("fail")) {
+            return false;
+        } else if (result.equals("process run fail: Timeout")) {
+            throw new RuntimeException("시간초과");
+        }
+        throw new RuntimeException(result);
+    }
+    
+
+    // public String runCode(String code, String lang, Problem problem, List<Example> examples) {
+        
+
+    //     int total = examples.size() + 1;
+    //     int count = 0;
+
+    //     if (lang.equals("Python")) {
+    //         String result;
+    //         try {
+    //             result = pythonCompile(code, problem.getProblemExampleInput(), problem.getProblemExampleOutput());
+    //             if (result.equals("success")) {
+    //                 count++;
+    //             } else if (result.equals("process run fail: Timeout")) {
+    //                 return "시간초과";
+    //             } else if (!result.equals("fail")) {
+    //                 return result;
+    //             }
+    //         } catch (Exception e) {
+    //             e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력하여 문제를 진단
+    //             return "서버 에러: " + e.getMessage();
+    //         }
+    //         for (Example example : examples) {
+    //             try {
+    //                 result = pythonCompile(code, example.getExampleInput(), example.getExampleOutput());
+    //                 if (result.equals("success")) {
+    //                     count++;
+    //                 } else if (result.equals("process run fail: Timeout")) {
+    //                     return "시간초과";
+    //                 } else if (!result.equals("fail")) {
+    //                     return result;
+    //                 }
+    //             } catch (Exception e) {
+    //                 e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력하여 문제를 진단
+    //                 return "서버 에러: " + e.getMessage();
+    //             }
+    //         }
+    //         return String.format("%.1f", ((double) count / (double) total) * 100);
+    //     } else if (lang.equals("C")) {
+    //         String result;
+    //         try {
+    //             result = ClanguageCompile(code, problem.getProblemExampleInput(), problem.getProblemExampleOutput());
+    //             if (result.equals("success")) {
+    //                 count++;
+    //             } else if (result.equals("process run fail: Timeout")) {
+    //                 return "시간초과";
+    //             } else if (!result.equals("fail")) {
+    //                 return result;
+    //             }
+    //         } catch (Exception e) {
+    //             e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력하여 문제를 진단
+    //             return "서버 에러: " + e.getMessage();
+    //         }
+    //         for (Example example : examples) {
+    //             try {
+    //                 result = ClanguageCompile(code, example.getExampleInput(), example.getExampleOutput());
+    //                 if (result.equals("success")) {
+    //                     count++;
+    //                 } else if (result.equals("process run fail: Timeout")) {
+    //                     return "시간초과";
+    //                 } else if (!result.equals("fail")) {
+    //                     return result;
+    //                 }
+    //             } catch (Exception e) {
+    //                 e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력하여 문제를 진단
+    //                 return "서버 에러: " + e.getMessage();
+    //             }
+    //         }
+    //         return String.format("%.1f", ((double) count / (double) total) * 100);
+    //     } else if (lang.equals("JAVA")) {
+    //         String result;
+    //         try {
+    //             result = javaCompile(code, problem.getProblemExampleInput(), problem.getProblemExampleOutput());
+    //             if (result.equals("success")) {
+    //                 count++;
+    //             } else if (result.equals("process run fail: Timeout")) {
+    //                 return "시간초과";
+    //             } else if (!result.equals("fail")) {
+    //                 return result;
+    //             }
+    //         } catch (Exception e) {
+    //             e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력하여 문제를 진단
+    //             return "서버 에러: " + e.getMessage();
+    //         }
+    //         for (Example example : examples) {
+    //             try {
+    //                 result = javaCompile(code, example.getExampleInput(), example.getExampleOutput());
+    //                 if (result.equals("success")) {
+    //                     count++;
+    //                 } else if (result.equals("process run fail: Timeout")) {
+    //                     return "시간초과";
+    //                 } else if (!result.equals("fail")) {
+    //                     return result;
+    //                 }
+    //             } catch (Exception e) {
+    //                 e.printStackTrace(); // 예외 발생 시 스택 트레이스를 출력하여 문제를 진단
+    //                 return "서버 에러: " + e.getMessage();
+    //             }
+    //         }
+    //         return String.format("%.1f", ((double) count / (double) total) * 100);
+    //     } else {
+    //         return "제출 오류";
+    //     }
+    // }
+
+    
 
     // javaCompile
     public String javaCompile(String code, String exampleInput, String exampleOutput) throws Exception {

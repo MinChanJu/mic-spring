@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.mic_spring.domain.dto.ApiResponse;
 import com.example.mic_spring.domain.dto.CodeDTO;
+import com.example.mic_spring.domain.dto.CodeResultDTO;
 import com.example.mic_spring.domain.dto.ContestScoreDTO;
 import com.example.mic_spring.domain.dto.ContestsAndProblemsDTO;
 import com.example.mic_spring.service.CodeService;
@@ -49,9 +50,9 @@ public class MyController {
     }
 
     @PostMapping("/code")
-    public ResponseEntity<ApiResponse<String>> runCode(@RequestBody CodeDTO codeDTO) {
-        String result = codeService.runCode(codeDTO);
-        ApiResponse<String> response = new ApiResponse<>(200, true, "코드 테스트 성공", result);
+    public ResponseEntity<ApiResponse<CodeResultDTO>> runCode(@RequestBody CodeDTO codeDTO) {
+        CodeResultDTO result = codeService.runCode(codeDTO);
+        ApiResponse<CodeResultDTO> response = new ApiResponse<>(200, true, "코드 테스트 성공", result);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 }

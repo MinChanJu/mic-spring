@@ -6,6 +6,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.example.mic_spring.domain.dto.CodeDTO;
+import com.example.mic_spring.domain.dto.CodeResultDTO;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
@@ -20,8 +21,8 @@ public class CodeServiceTest {
     void code() {
         CodeDTO codeDTO = new CodeDTO("test", "print('Hello')", "Python", 2L);
 
-        String result1 = codeService.runCode(codeDTO);
+        CodeResultDTO result1 = codeService.runCode(codeDTO);
 
-        assertThat(result1).isEqualTo("50.0");
+        assertThat(result1.getResult()).isEqualTo("50.0");
     }
 }
