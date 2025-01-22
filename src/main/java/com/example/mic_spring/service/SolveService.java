@@ -17,9 +17,17 @@ public class SolveService {
     @Autowired private SolveRepository solveRepository;
 
     public Solve getSolveByUserIdAndProblemId(String userId, Long problemId) {
-        if (problemId == null) throw new CustomException(ErrorCode.SOLVE_NOT_FOUND);
+        if (userId == null || problemId == null) throw new CustomException(ErrorCode.SOLVE_NOT_FOUND);
         Optional<Solve> solve = solveRepository.findByUserIdAndProblemId(userId, problemId);
         if (solve.isEmpty()) throw new CustomException(ErrorCode.SOLVE_NOT_FOUND);
+
+        return solve.get();
+    }
+
+    public Solve existSolveByUserIdAndProblemId(String userId, Long problemId) {
+        if (userId == null || problemId == null) return null;
+        Optional<Solve> solve = solveRepository.findByUserIdAndProblemId(userId, problemId);
+        if (solve.isEmpty()) return null;
 
         return solve.get();
     }
@@ -30,6 +38,10 @@ public class SolveService {
 
     public List<Solve> getAllSolvesByUserId(String userId) {
         return solveRepository.findByUserId(userId);
+    }
+
+    public List<Solve> getAllSolvesByUserIdOrderByProblemIdAsc(String userId) {
+        return solveRepository.findByUserIdOrderByProblemIdAsc(userId);
     }
 
     public List<Solve> getAllSolvesByProblemId(Long problemId) {

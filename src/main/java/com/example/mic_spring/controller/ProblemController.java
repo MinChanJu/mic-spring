@@ -4,6 +4,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.mic_spring.domain.dto.ApiResponse;
 import com.example.mic_spring.domain.dto.ProblemDTO;
+import com.example.mic_spring.domain.dto.ProblemListDTO;
 import com.example.mic_spring.domain.dto.ProblemScoreDTO;
 import com.example.mic_spring.domain.entity.Problem;
 import com.example.mic_spring.service.ProblemService;
@@ -27,10 +28,31 @@ public class ProblemController {
 
     @Autowired private ProblemService problemService;
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<Problem>>> getAllProblems() {
-        List<Problem> problems = problemService.getAllProblems();
-        ApiResponse<List<Problem>> response = new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<ProblemListDTO>>> getProblemList() {
+        List<ProblemListDTO> problems = problemService.getProblemList();
+        ApiResponse<List<ProblemListDTO>> response = new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/all/{userId}")
+    public ResponseEntity<ApiResponse<List<ProblemListDTO>>> getProblemListWithUserId(@PathVariable("userId") String userId) {
+        List<ProblemListDTO> problems = problemService.getProblemListWithUserId(userId);
+        ApiResponse<List<ProblemListDTO>> response = new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/contest/{contestId}")
+    public ResponseEntity<ApiResponse<List<ProblemListDTO>>> getProblemListByContestId(@PathVariable("contestId") Long contestId) {
+        List<ProblemListDTO> problems = problemService.getProblemListByContestId(contestId);
+        ApiResponse<List<ProblemListDTO>> response = new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problems);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
+    @GetMapping("/contest/{contestId}/{userId}")
+    public ResponseEntity<ApiResponse<List<ProblemListDTO>>> getProblemListByContestIdWithUserId(@PathVariable("contestId") Long contestId, @PathVariable("userId") String userId) {
+        List<ProblemListDTO> problems = problemService.getProblemListByContestIdWithUserId(contestId, userId);
+        ApiResponse<List<ProblemListDTO>> response = new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problems);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
@@ -38,13 +60,6 @@ public class ProblemController {
     public ResponseEntity<ApiResponse<Problem>> getProblemById(@PathVariable("id") Long id) {
         Problem problem = problemService.getProblemById(id);
         ApiResponse<Problem> response = new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problem);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
-
-    @GetMapping("/contest/{contestId}")
-    public ResponseEntity<ApiResponse<List<Problem>>> getAllProblemsByContestId(@PathVariable("contestId") Long contestId) {
-        List<Problem> problems = problemService.getAllProblemsByContestId(contestId);
-        ApiResponse<List<Problem>> response = new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problems);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

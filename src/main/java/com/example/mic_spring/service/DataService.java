@@ -18,10 +18,14 @@ import java.util.ArrayList;
 @Service
 public class DataService {
 
-    @Autowired private ContestService contestService;
-    @Autowired private ProblemService problemService;
-    @Autowired private SolveService solveService;
-    @Autowired private UserService userService;
+    @Autowired
+    private ContestService contestService;
+    @Autowired
+    private ProblemService problemService;
+    @Autowired
+    private SolveService solveService;
+    @Autowired
+    private UserService userService;
 
     public ContestsAndProblemsDTO getAllContestsAndProblems() {
         List<Contest> contests = contestService.getAllContests();
@@ -38,26 +42,36 @@ public class DataService {
         for (User user : participants) {
             List<SubmitDTO> solveProblems = new ArrayList<>();
             for (Problem problem : problems) {
-                Solve solved = solveService.getSolveByUserIdAndProblemId(user.getUserId(), problem.getId());
-                if (solved == null) solveProblems.add(new SubmitDTO(problem.getId(), (short) 0));
-                else solveProblems.add(new SubmitDTO(problem.getId(), solved.getScore()));
+                Solve solve = solveService.existSolveByUserIdAndProblemId(user.getUserId(), problem.getId());
+                if (solve == null)
+                    solveProblems.add(new SubmitDTO(problem.getId(), (short) 0));
+                else
+                    solveProblems.add(new SubmitDTO(problem.getId(), solve.getScore()));
             }
             contestScores.add(new ContestScoreDTO(user.getName(), solveProblems));
         }
-
+        contestScores.sort((a, b) -> {
+            int sumA = 0, sumB = 0;
+            for (SubmitDTO submit : a.getSolveProblems()) sumA += submit.getScore();
+            for (SubmitDTO submit : b.getSolveProblems()) sumB += submit.getScore();
+            return sumB-sumA;
+        });
         return contestScores;
     }
 
     public ContestsAndProblemsDTO getAllFilterContestsAndProblems() {
         List<Contest> contests = contestService.getAllContests();
         List<Problem> problems = problemService.getAllProblems().stream()
-        .filter(problem -> {
-            if (problem.getContestId() == null) return true;
-            Contest contest = contestService.getContestById(problem.getContestId());
-            if (contest.getEndTime() == null) return true;
-            if (contest.getEndTime().isBefore(ZonedDateTime.now())) return true;
-            return false;
-        }).toList();
+                .filter(problem -> {
+                    if (problem.getContestId() == null)
+                        return true;
+                    Contest contest = contestService.getContestById(problem.getContestId());
+                    if (contest.getEndTime() == null)
+                        return true;
+                    if (contest.getEndTime().isBefore(ZonedDateTime.now()))
+                        return true;
+                    return false;
+                }).toList();
         ContestsAndProblemsDTO contestsAndProblems = new ContestsAndProblemsDTO(contests, problems);
         return contestsAndProblems;
     }

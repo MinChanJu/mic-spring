@@ -3,11 +3,14 @@ package com.example.mic_spring.service;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.example.mic_spring.domain.dto.ContestListDTO;
 import com.example.mic_spring.domain.entity.Contest;
 import com.example.mic_spring.exception.CustomException;
 import com.example.mic_spring.exception.ErrorCode;
 import com.example.mic_spring.repository.ContestRepository;
 
+import java.time.ZonedDateTime;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -24,8 +27,15 @@ public class ContestService {
         return contest.get();
     }
 
+    public String getContestNameById(Long id) {
+        if (id == null) return "이 문제는 대회에 속하지 않습니다.";
+        Optional<Contest> contest = contestRepository.findById(id);
+        if (contest.isEmpty()) return "이 문제는 대회에 속하지 않습니다.";
+        return contest.get().getContestName();
+    }
+
     public List<Contest> getAllContestsByUserId(String userId) {
-        return contestRepository.findByUserId(userId);
+        return contestRepository.findByUserIdOrderByIdAsc(userId);
     }
 
     public List<Contest> getAllContests() {
@@ -37,6 +47,24 @@ public class ContestService {
             return a.getStartTime().isBefore(b.getStartTime()) ? 1 : -1;
         });
         return contests;
+    }
+
+    public List<ContestListDTO> getContestList() {
+        List<Contest> contests = contestRepository.findAllOrderByStartTimeDescOrCreatedAtDesc();
+        List<ContestListDTO> contestList = new ArrayList<>();
+
+        Long idx = 1L;
+        for (Contest contest : contests) {
+            Long id = idx++;
+            Long contestId = contest.getId();
+            String contestName = contest.getContestName();
+            String userId = contest.getUserId();
+            ZonedDateTime startTime = contest.getStartTime();
+            ZonedDateTime endTime = contest.getEndTime();
+            contestList.add(new ContestListDTO(id, contestId, contestName, userId, startTime, endTime));
+        }
+
+        return contestList;
     }
 
     public Contest createContest(Contest contest) {

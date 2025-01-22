@@ -3,6 +3,7 @@ package com.example.mic_spring.controller;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.example.mic_spring.domain.dto.ApiResponse;
+import com.example.mic_spring.domain.dto.ContestListDTO;
 import com.example.mic_spring.domain.entity.Contest;
 import com.example.mic_spring.service.ContestService;
 
@@ -25,10 +26,10 @@ public class ContestController {
 
     @Autowired private ContestService contestService;
 
-    @GetMapping
-    public ResponseEntity<ApiResponse<List<Contest>>> getAllContests() {
-        List<Contest> contests = contestService.getAllContests();
-        ApiResponse<List<Contest>> response = new ApiResponse<>(200, true, "모든 대회 조회 성공", contests);
+    @GetMapping("/all")
+    public ResponseEntity<ApiResponse<List<ContestListDTO>>> getContestList() {
+        List<ContestListDTO> contests = contestService.getContestList();
+        ApiResponse<List<ContestListDTO>> response = new ApiResponse<>(200, true, "모든 대회 조회 성공", contests);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 

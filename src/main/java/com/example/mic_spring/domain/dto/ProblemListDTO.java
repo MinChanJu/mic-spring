@@ -9,8 +9,10 @@ import lombok.Setter;
 @NoArgsConstructor
 @Getter
 @Setter
-public class ProblemScoreDTO {
+public class ProblemListDTO {
+    private Long id;
     private Long problemId;
     private String problemName;
+    private String contestName;
     private Short score;
 }

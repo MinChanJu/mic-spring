@@ -13,5 +13,5 @@ import java.util.List;
 @Setter
 public class ContestScoreDTO {
     private String name;
-    private List<SubmitDTO> solvedProblems;
+    private List<SubmitDTO> solveProblems;
 }
