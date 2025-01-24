@@ -42,6 +42,13 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
 
+    @GetMapping("/contest/{contestId}")
+    public ResponseEntity<ApiResponse<List<User>>> getAllUsersByContestId(@PathVariable("contestId") Long contestId) {
+        List<User> users = userService.getAllUsersByContestId(contestId);
+        ApiResponse<List<User>> response = new ApiResponse<>(200, true, "회원 아이디로 조회 성공", users);
+        return ResponseEntity.status(HttpStatus.OK).body(response);
+    }
+
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<User>> getUserByUserIdAndUserPw(@RequestBody UserLoginDTO userLoginDTO) {
         User user = userService.getUserByUserIdAndUserPw(userLoginDTO);
