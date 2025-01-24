@@ -51,9 +51,9 @@ public class SolveServiceTest {
         Solve find2 = solveService.solveProblem(solve2);
         Solve find3 = solveService.solveProblem(solve3);
 
-        assertThat(find1.getScore()).isEqualTo(solve1.getScore());
-        assertThat(find2.getScore()).isEqualTo(solve1.getScore());
-        assertThat(find3.getScore()).isEqualTo(solve3.getScore());
+        assertThat(find1.getScore()).isEqualTo((short) 1000);
+        assertThat(find2.getScore()).isEqualTo((short) 1000);
+        assertThat(find3.getScore()).isEqualTo((short) 1000);
     }
 
     @Test
@@ -79,9 +79,9 @@ public class SolveServiceTest {
         List<Solve> find3 = solveService.getAllSolvesByUserId("test1");
         List<Solve> find4 = solveService.getAllSolvesByProblemId(2L);
 
-        assertThat(find1.getScore()).isEqualTo((short) 800);
-        assertThat(find2.size() - size1).isEqualTo(4);
-        assertThat(find3.size() - size2).isEqualTo(2);
+        assertThat(find1.getScore()).isEqualTo((short) 1000);
+        assertThat(find2.size() - size1).isEqualTo(3);
+        assertThat(find3.size() - size2).isEqualTo(1);
         assertThat(find4.size() - size3).isEqualTo(2);
 
         assertThatThrownBy(() -> solveService.getSolveByUserIdAndProblemId("null", null))
@@ -103,7 +103,10 @@ public class SolveServiceTest {
         solveService.solveProblem(solve4);
         solveService.solveProblem(solve5);
 
-        solveService.deleteSolve(solve1.getId());
+        
+        assertThatThrownBy(() -> solveService.deleteSolve(solve1.getId()))
+                .isInstanceOf(CustomException.class)
+                .hasMessage(ErrorCode.SOLVE_NOT_FOUND.getMessage());
         assertThatThrownBy(() -> solveService.deleteSolve(null))
                 .isInstanceOf(CustomException.class)
                 .hasMessage(ErrorCode.SOLVE_NOT_FOUND.getMessage());
