@@ -28,6 +28,9 @@ public class Example {
     @Column(name = "problem_id", nullable = false)
     private Long problemId;
 
+    @Column(name = "user_id", nullable = false)
+    private String userId;
+
     @Column(name = "example_input", nullable = false)
     private String exampleInput;
 

@@ -5,76 +5,134 @@ import org.springframework.stereotype.Service;
 
 import com.example.mic_spring.domain.dto.UserDTO;
 import com.example.mic_spring.domain.dto.UserLoginDTO;
+import com.example.mic_spring.domain.dto.UserResponseDTO;
+import com.example.mic_spring.domain.entity.Contest;
 import com.example.mic_spring.domain.entity.User;
 import com.example.mic_spring.exception.CustomException;
 import com.example.mic_spring.exception.ErrorCode;
 import com.example.mic_spring.repository.UserRepository;
+import com.example.mic_spring.security.JwtUtil;
+import com.example.mic_spring.security.Token;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
 @Service
 public class UserService {
 
-    @Autowired private UserRepository userRepository;
+    @Autowired
+    private UserRepository userRepository;
+    private ContestService contestService;
+    private JwtUtil jwtUtil;
+
+    public UserService(ContestService contestService, JwtUtil jwtUtil) {
+        this.contestService = contestService;
+        this.jwtUtil = jwtUtil;
+    }
 
     public User getUserById(Long id) {
-        if (id == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        if (id == null)
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        if (user.isEmpty())
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
         return user.get();
     }
 
     public UserDTO getUserByUserId(String userId) {
         Optional<User> user = userRepository.findByUserId(userId);
-        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        if (user.isEmpty())
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
 
         UserDTO userDTO = new UserDTO(user.get());
         return userDTO;
     }
 
-    public User getUserByUserIdAndUserPw(UserLoginDTO userLoginDTO) {
+    public UserResponseDTO getUserByUserIdAndUserPw(UserLoginDTO userLoginDTO) {
         String userId = userLoginDTO.getUserId(), userPw = userLoginDTO.getUserPw();
-        Optional<User> user = userRepository.findByUserIdAndUserPw(userId, userPw);
-        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        Optional<User> findUser = userRepository.findByUserIdAndUserPw(userId, userPw);
+        if (findUser.isEmpty())
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        User user = findUser.get();
 
-        return user.get();
+        return new UserResponseDTO(user, jwtUtil.generateToken(userId, user.getAuthority(), user.getContestId()));
     }
 
-    public List<User> getAllUsers() {
+    public List<User> getAllUsers(Token token) {
+        if (token.getAuthority() != 5)
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         return userRepository.findAll();
     }
 
-    public List<User> getAllUsersByContestId(Long contestId) {
-        if (contestId == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        
+    public List<User> getAllUsersByContestId(Long contestId, Token token) {
+        if (token.getUserId() == null)
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+        if (token.getAuthority() == null)
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+
+        Contest contest = contestService.getContestById(contestId);
+        if (!token.getUserId().equals(contest.getUserId()) && token.getAuthority() != 5)
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+
         return userRepository.findByContestId(contestId);
     }
 
+    public List<UserDTO> getAllUserDTOsByContestId(Long contestId) {
+        List<User> users = userRepository.findByContestId(contestId);
+        List<UserDTO> userDTOs = new ArrayList<>();
+        for (User user : users) {
+            userDTOs.add(new UserDTO(user));
+        }
+        return userDTOs;
+    }
+
     public User createUser(User user) {
-        if (userRepository.existsByUserId(user.getUserId())) throw new CustomException(ErrorCode.DUPLICATE_USER_ID);
+        if (userRepository.existsByUserId(user.getUserId()))
+            throw new CustomException(ErrorCode.DUPLICATE_USER_ID);
 
         String password = user.getUserPw();
-        if (!password.matches(".*[a-zA-Z].*")) throw new CustomException(ErrorCode.INVALID_PASSWORD_ALP);   // 영문자 포함 되었는지 확인
-        if (!password.matches(".*\\d.*")) throw new CustomException(ErrorCode.INVALID_PASSWORD_NUM);        // 숫자 포함 되었는지 확인
-        if (!password.matches("[a-zA-Z0-9]+")) throw new CustomException(ErrorCode.INVALID_PASSWORD_SPE);   // 영문자 및 숫자를 제외한 다른 문자가 포함 안되었는지 확인
-        if (password.length() < 8) throw new CustomException(ErrorCode.INVALID_PASSWORD_LEN);                     // 길이가 8자 이상인지 확인
+        if (!password.matches(".*[a-zA-Z].*"))
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_ALP); // 영문자 포함 되었는지 확인
+        if (!password.matches(".*\\d.*"))
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_NUM); // 숫자 포함 되었는지 확인
+        if (!password.matches("[a-zA-Z0-9]+"))
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_SPE); // 영문자 및 숫자를 제외한 다른 문자가 포함 안되었는지 확인
+        if (password.length() < 8)
+            throw new CustomException(ErrorCode.INVALID_PASSWORD_LEN); // 길이가 8자 이상인지 확인
 
         return userRepository.save(user);
     }
 
-    public User updateUser(User user) {
-        if (user.getId() == null) throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        if (!userRepository.existsById(user.getId())) throw new CustomException(ErrorCode.USER_NOT_FOUND);
+    public User updateUser(User user, Token token) {
+        if (user.getId() == null)
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        Optional<User> findUser = userRepository.findById(user.getId());
+        if (findUser.isEmpty())
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+        User prev = findUser.get();
 
+        if (!user.getUserId().equals(token.getUserId()) && token.getAuthority() != 5)
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+
+        if (user.getUserId().equals(token.getUserId()))
+            return userRepository.save(user);
+        if (!prev.updateAdmin(user))
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
         return userRepository.save(user);
     }
 
-    public void deleteUser(Long id) {
+    public void deleteUser(Long id, Token token) {
+        if (id == null)
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
         Optional<User> user = userRepository.findById(id);
-        if (user.isEmpty()) throw new CustomException(ErrorCode.USER_NOT_FOUND);
-        
+        if (user.isEmpty())
+            throw new CustomException(ErrorCode.USER_NOT_FOUND);
+
+        if (!token.getUserId().equals(user.get().getUserId()) && token.getAuthority() != 5)
+            throw new CustomException(ErrorCode.UNAUTHORIZED);
+
         userRepository.delete(user.get());
     }
 }

@@ -7,6 +7,7 @@ import com.example.mic_spring.domain.entity.Solve;
 import com.example.mic_spring.exception.CustomException;
 import com.example.mic_spring.exception.ErrorCode;
 import com.example.mic_spring.repository.SolveRepository;
+import com.example.mic_spring.security.Token;
 
 import java.util.List;
 import java.util.Optional;
@@ -48,7 +49,8 @@ public class SolveService {
         return solveRepository.findByProblemId(problemId);
     }
 
-    public Solve solveProblem(Solve solveDetail) {
+    public Solve solveProblem(Solve solveDetail, Token token) {
+        if (!solveDetail.getUserId().equals(token.getUserId())) throw new CustomException(ErrorCode.UNAUTHORIZED);
         if (solveDetail.getProblemId() == null) throw new CustomException(ErrorCode.SOLVE_NOT_FOUND);
         Optional<Solve> solve = solveRepository.findByUserIdAndProblemId(solveDetail.getUserId(), solveDetail.getProblemId());
         if (solve.isEmpty()) return solveRepository.save(solveDetail);

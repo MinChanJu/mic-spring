@@ -22,7 +22,9 @@ public enum ErrorCode {
 
     EXAMPLE_NOT_FOUND(HttpStatus.NOT_FOUND, "예제를 찾을 수 없습니다."),
 
-    SOLVE_NOT_FOUND(HttpStatus.NOT_FOUND, "해결을 찾을 수 없습니다.");
+    SOLVE_NOT_FOUND(HttpStatus.NOT_FOUND, "해결을 찾을 수 없습니다."),
+
+    UNAUTHORIZED(HttpStatus.FORBIDDEN, "권한이 없습니다.");
 
     private final HttpStatus status;
     private final String message;

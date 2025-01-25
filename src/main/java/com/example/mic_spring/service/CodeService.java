@@ -1,6 +1,5 @@
 package com.example.mic_spring.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.example.mic_spring.domain.dto.CodeDTO;
@@ -8,6 +7,7 @@ import com.example.mic_spring.domain.dto.CodeResultDTO;
 import com.example.mic_spring.domain.entity.Example;
 import com.example.mic_spring.domain.entity.Problem;
 import com.example.mic_spring.domain.entity.Solve;
+import com.example.mic_spring.security.Token;
 
 import javax.tools.SimpleJavaFileObject;
 import javax.tools.JavaFileObject;
@@ -47,16 +47,22 @@ import java.lang.reflect.Method;
 @Service
 public class CodeService {
 
-    @Autowired private ProblemService problemService;
-    @Autowired private ExampleService exampleService;
-    @Autowired private SolveService solveService;
+    private ProblemService problemService;
+    private ExampleService exampleService;
+    private SolveService solveService;
 
-    public CodeResultDTO runCode(CodeDTO codeDTO) {
+    public CodeService(ProblemService problemService, ExampleService exampleService, SolveService solveService) {
+        this.problemService = problemService;
+        this.exampleService = exampleService;
+        this.solveService = solveService;
+    }
+
+    public CodeResultDTO runCode(CodeDTO codeDTO, Token token) {
         String userId = codeDTO.getUserId();
         String code = codeDTO.getCode();
         String lang = codeDTO.getLang();
         Long problemId = codeDTO.getProblemId();
-        Problem problem = problemService.getProblemById(problemId);
+        Problem problem = problemService.getProblemById(problemId, token);
         List<Example> examples = exampleService.getAllExamplesByProblemId(problemId);
 
         String result = runCode(code, lang, problem, examples);
@@ -64,7 +70,7 @@ public class CodeService {
         Solve solve = new Solve(null, userId, problemId, (short) 0, lang, code, ZonedDateTime.now());
         if (result.matches("[+-]?\\d*(\\.\\d+)?")) solve.setScore((short) (Double.parseDouble(result)*10));
 
-        solveService.solveProblem(solve);
+        solveService.solveProblem(solve, token);
 
         List<Solve> solves = solveService.getAllSolvesByUserId(userId);
 

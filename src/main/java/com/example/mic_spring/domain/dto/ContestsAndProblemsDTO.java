@@ -8,7 +8,6 @@ import lombok.Setter;
 import java.util.List;
 
 import com.example.mic_spring.domain.entity.Contest;
-import com.example.mic_spring.domain.entity.Problem;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -16,5 +15,5 @@ import com.example.mic_spring.domain.entity.Problem;
 @Setter
 public class ContestsAndProblemsDTO {
     private List<Contest> contests;
-    private List<Problem> problems;
+    private List<ProblemListDTO> problems;
 }

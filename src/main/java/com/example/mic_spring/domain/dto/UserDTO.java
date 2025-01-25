@@ -18,7 +18,7 @@ public class UserDTO {
     private String name;
     private String userId;
     private String email;
-    private Long authority;
+    private Short authority;
     private ZonedDateTime createdAt;
 
     public UserDTO(User user) {

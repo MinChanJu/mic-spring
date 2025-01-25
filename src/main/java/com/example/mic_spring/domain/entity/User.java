@@ -44,11 +44,21 @@ public class User {
     private String email;
 
     @Column(name = "authority", nullable = false)
-    private Long authority;
+    private Short authority;
 
-    @Column(name = "contest_id")
+    @Column(name = "contest_id", nullable = false)
     private Long contestId;
 
     @Column(name = "created_at", nullable = false)
     private ZonedDateTime createdAt = ZonedDateTime.now();
+
+    public boolean updateAdmin(User user) {
+        if (!user.getName().equals(name)) return false;
+        if (!user.getUserId().equals(userId)) return false;
+        if (!user.getUserPw().equals(userPw)) return false;
+        if (!user.getPhone().equals(phone)) return false;
+        if (!user.getEmail().equals(email)) return false;
+
+        return true;
+    }
 }

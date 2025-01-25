@@ -4,7 +4,10 @@ import org.springframework.web.bind.annotation.RestController;
 
 import com.example.mic_spring.domain.dto.ApiResponse;
 import com.example.mic_spring.domain.entity.Solve;
+import com.example.mic_spring.security.Token;
 import com.example.mic_spring.service.SolveService;
+
+import jakarta.servlet.http.HttpServletRequest;
 
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -38,8 +41,9 @@ public class SolveController {
     }
 
     @PostMapping
-    public ResponseEntity<ApiResponse<Solve>> solveProblem(@RequestBody Solve solveDetail) {
-        Solve solve = solveService.solveProblem(solveDetail);
+    public ResponseEntity<ApiResponse<Solve>> solveProblem(@RequestBody Solve solveDetail, HttpServletRequest request) {
+        Token token = (Token) request.getAttribute("token");
+        Solve solve = solveService.solveProblem(solveDetail, token);
         ApiResponse<Solve> response = new ApiResponse<>(200, true, "해결 성공", solve);
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
