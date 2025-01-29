@@ -1,35 +1,27 @@
 package com.example.mic_spring.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.mic_spring.domain.dto.*;
+import com.example.mic_spring.domain.entity.*;
+import com.example.mic_spring.exception.*;
+import com.example.mic_spring.repository.*;
+import com.example.mic_spring.security.*;
+
 import org.springframework.stereotype.Service;
 
-import com.example.mic_spring.domain.dto.ProblemDTO;
-import com.example.mic_spring.domain.dto.ProblemListDTO;
-import com.example.mic_spring.domain.dto.ProblemScoreDTO;
-import com.example.mic_spring.domain.entity.Contest;
-import com.example.mic_spring.domain.entity.Example;
-import com.example.mic_spring.domain.entity.Problem;
-import com.example.mic_spring.domain.entity.Solve;
-import com.example.mic_spring.exception.CustomException;
-import com.example.mic_spring.exception.ErrorCode;
-import com.example.mic_spring.repository.ProblemRepository;
-import com.example.mic_spring.security.Token;
-
+import java.util.*;
 import java.time.ZonedDateTime;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
 
 @Service
 public class ProblemService {
 
-    @Autowired
     private ProblemRepository problemRepository;
     private ContestService contestService;
     private ExampleService exampleService;
     private SolveService solveService;
 
-    public ProblemService(ContestService contestService, ExampleService exampleService, SolveService solveService) {
+    public ProblemService(ProblemRepository problemRepository, ContestService contestService,
+            ExampleService exampleService, SolveService solveService) {
+        this.problemRepository = problemRepository;
         this.contestService = contestService;
         this.exampleService = exampleService;
         this.solveService = solveService;
@@ -44,7 +36,7 @@ public class ProblemService {
         Problem problem = findProblem.get();
 
         if (problem.getContestId() != null) {
-            Contest contest = contestService.getContestById(problem.getContestId());
+            ContestListDTO contest = contestService.getContestById(problem.getContestId());
             if (!contest.getUserId().equals(token.getUserId()) && token.getAuthority() != 5) {
                 if (contest.getStartTime() != null && contest.getStartTime().isAfter(ZonedDateTime.now())) {
                     throw new CustomException(ErrorCode.UNAUTHORIZED);
@@ -72,9 +64,11 @@ public class ProblemService {
         for (Problem problem : problems) {
             Long problemId = problem.getId();
             if (problem.getContestId() != null) {
-                Contest contest = contestService.getContestById(problem.getContestId());
-                if (contest.getStartTime() != null && contest.getStartTime().isAfter(ZonedDateTime.now())) continue;
-                if (contest.getEndTime() != null && contest.getEndTime().isAfter(ZonedDateTime.now())) continue;
+                ContestListDTO contest = contestService.getContestById(problem.getContestId());
+                if (contest.getStartTime() != null && contest.getStartTime().isAfter(ZonedDateTime.now()))
+                    continue;
+                if (contest.getEndTime() != null && contest.getEndTime().isAfter(ZonedDateTime.now()))
+                    continue;
             }
             String problemName = problem.getProblemName();
             String contestName = contestService.getContestNameById(problem.getContestId());
@@ -99,9 +93,11 @@ public class ProblemService {
         for (Problem problem : problems) {
             Long problemId = problem.getId();
             if (problem.getContestId() != null) {
-                Contest contest = contestService.getContestById(problem.getContestId());
-                if (contest.getStartTime() != null && contest.getStartTime().isAfter(ZonedDateTime.now())) continue;
-                if (contest.getEndTime() != null && contest.getEndTime().isAfter(ZonedDateTime.now())) continue;
+                ContestListDTO contest = contestService.getContestById(problem.getContestId());
+                if (contest.getStartTime() != null && contest.getStartTime().isAfter(ZonedDateTime.now()))
+                    continue;
+                if (contest.getEndTime() != null && contest.getEndTime().isAfter(ZonedDateTime.now()))
+                    continue;
             }
             String problemName = problem.getProblemName();
             String contestName = contestService.getContestNameById(problem.getContestId());
@@ -126,7 +122,7 @@ public class ProblemService {
     }
 
     public List<ProblemListDTO> getProblemListByContestId(Long contestId, Token token) {
-        Contest contest = contestService.getContestById(contestId);
+        ContestListDTO contest = contestService.getContestById(contestId);
         if (!contest.getUserId().equals(token.getUserId()) && token.getAuthority() != 5) {
             if (contest.getStartTime() != null && contest.getStartTime().isAfter(ZonedDateTime.now())) {
                 throw new CustomException(ErrorCode.UNAUTHORIZED);

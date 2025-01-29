@@ -31,25 +31,25 @@ public class Problem {
     @Column(name = "contest_id")
     private Long contestId;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", columnDefinition = "TEXT", nullable = false)
     private String userId;
 
-    @Column(name = "problem_name", nullable = false)
+    @Column(name = "problem_name", columnDefinition = "TEXT", nullable = false)
     private String problemName;
 
-    @Column(name = "problem_description", nullable = false)
+    @Column(name = "problem_description", columnDefinition = "TEXT", nullable = false)
     private String problemDescription;
 
-    @Column(name = "problem_input_description", nullable = false)
+    @Column(name = "problem_input_description", columnDefinition = "TEXT", nullable = false)
     private String problemInputDescription;
 
-    @Column(name = "problem_output_description", nullable = false)
+    @Column(name = "problem_output_description", columnDefinition = "TEXT", nullable = false)
     private String problemOutputDescription;
 
-    @Column(name = "problem_example_input", nullable = false)
+    @Column(name = "problem_example_input", columnDefinition = "TEXT", nullable = false)
     private String problemExampleInput;
 
-    @Column(name = "problem_example_output", nullable = false)
+    @Column(name = "problem_example_output", columnDefinition = "TEXT", nullable = false)
     private String problemExampleOutput;
 
     @Column(name = "created_at", nullable = false)

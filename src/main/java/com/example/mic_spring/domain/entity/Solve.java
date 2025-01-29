@@ -28,7 +28,7 @@ public class Solve {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", columnDefinition = "TEXT", nullable = false)
     private String userId;
 
     @Column(name = "problem_id", nullable = false)
@@ -37,10 +37,10 @@ public class Solve {
     @Column(name = "score", nullable = false)
     private Short score;
 
-    @Column(name = "lang", nullable = false)
+    @Column(name = "lang", columnDefinition = "TEXT", nullable = false)
     private String lang;
 
-    @Column(name = "code", nullable = false)
+    @Column(name = "code", columnDefinition = "TEXT", nullable = false)
     private String code;
 
     @Column(name = "created_at", nullable = false)

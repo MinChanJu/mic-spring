@@ -1,78 +1,125 @@
 package com.example.mic_spring.controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import com.example.mic_spring.domain.dto.*;
+import com.example.mic_spring.domain.entity.*;
+import com.example.mic_spring.security.*;
+import com.example.mic_spring.service.*;
 
-import com.example.mic_spring.domain.dto.ApiResponse;
-import com.example.mic_spring.domain.dto.ContestListDTO;
-import com.example.mic_spring.domain.entity.Contest;
-import com.example.mic_spring.security.Token;
-import com.example.mic_spring.service.ContestService;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
 
+import java.util.*;
+import java.util.concurrent.*;
 import jakarta.servlet.http.HttpServletRequest;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/contests")
 public class ContestController {
 
-    @Autowired private ContestService contestService;
+    private ContestService contestService;
+    private RequestQueueService requestQueueService;
+    private final Map<String, Future<? extends ApiResponse<?>>> requestResults = new ConcurrentHashMap<>();
+
+    public ContestController(ContestService contestService, RequestQueueService requestQueueService) {
+        this.contestService = contestService;
+        this.requestQueueService = requestQueueService;
+    }
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<ContestListDTO>>> getContestList() {
-        List<ContestListDTO> contests = contestService.getContestList();
-        ApiResponse<List<ContestListDTO>> response = new ApiResponse<>(200, true, "모든 대회 조회 성공", contests);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<ApiResponse<String>> getContestList() {
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<List<ContestListDTO>>> future = requestQueueService.addRequest(() -> {
+            List<ContestListDTO> contests = contestService.getContestList();
+            return new ApiResponse<>(200, true, "모든 대회 조회 성공", contests);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
+    }
+
+    @GetMapping("/all/{userId}")
+    public ResponseEntity<ApiResponse<String>> getContestListByUserId(@PathVariable("userId") String userId,
+            HttpServletRequest request) {
+        Token token = (Token) request.getAttribute("token");
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<List<ContestListDTO>>> future = requestQueueService.addRequest(() -> {
+            List<ContestListDTO> contests = contestService.getContestListByUserId(userId, token);
+            return new ApiResponse<>(200, true, "회원 아이디로 조회 성공", contests);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Contest>> getContestById(@PathVariable("id") Long id) {
-        Contest contest = contestService.getContestById(id);
-        ApiResponse<Contest> response = new ApiResponse<>(200, true, "대회 아이디로 조회 성공", contest);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
-    }
+    public ResponseEntity<ApiResponse<String>> getContestById(@PathVariable("id") Long id) {
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<List<ContestListDTO>>> future = requestQueueService.addRequest(() -> {
+            List<ContestListDTO> contest = new ArrayList<>();
+            contest.add(contestService.getContestById(id));
+            return new ApiResponse<>(200, true, "대회 아이디로 조회 성공", contest);
+        });
+        requestResults.put(requestId, future);
 
-    @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse<List<Contest>>> getAllContestsByUserId(@PathVariable("userId") String userId, HttpServletRequest request) {
-        Token token = (Token) request.getAttribute("token");
-        List<Contest> contests = contestService.getAllContestsByUserId(userId, token);
-        ApiResponse<List<Contest>> response = new ApiResponse<>(200, true, "회원 아이디로 조회 성공", contests);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
-
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<Contest>> createContest(@RequestBody Contest contestDetail, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> createContest(@RequestBody Contest contestDetail,
+            HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        Contest contest = contestService.createContest(contestDetail, token);
-        ApiResponse<Contest> response = new ApiResponse<>(200, true, "대회 생성 성공", contest);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<Contest>> future = requestQueueService.addRequest(() -> {
+            Contest contest = contestService.createContest(contestDetail, token);
+            return new ApiResponse<>(200, true, "대회 생성 성공", contest);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse<Contest>> updateContest(@RequestBody Contest contestDetail, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> updateContest(@RequestBody Contest contestDetail,
+            HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        Contest contest = contestService.updateContest(contestDetail, token);
-        ApiResponse<Contest> response = new ApiResponse<>(200, true, "대회 수정 성공", contest);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<Contest>> future = requestQueueService.addRequest(() -> {
+            Contest contest = contestService.updateContest(contestDetail, token);
+            return new ApiResponse<>(200, true, "대회 수정 성공", contest);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteContest(@PathVariable("id") Long id, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> deleteContest(@PathVariable("id") Long id, HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        contestService.deleteContest(id, token);
-        ApiResponse<Void> response = new ApiResponse<>(200, true, "대회 삭제 성공", null);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<Void>> future = requestQueueService.addRequest(() -> {
+            contestService.deleteContest(id, token);
+            return new ApiResponse<>(200, true, "대회 삭제 성공", null);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
+    }
+
+    @GetMapping("/result/{requestId}")
+    public ResponseEntity<ApiResponse<?>> getResult(@PathVariable("requestId") String requestId) {
+        Future<? extends ApiResponse<?>> future = requestResults.get(requestId);
+        ResponseEntity<ApiResponse<?>> result = requestQueueService.getResult(future);
+        ApiResponse<?> responseBody = Optional.ofNullable(result.getBody())
+                .orElseGet(() -> new ApiResponse<>(502, false, "서버 내부 오류", null));
+        if (responseBody.getStatus() == 200) {
+            requestResults.remove(requestId);
+        } else if (responseBody.getStatus() == 500) {
+            requestResults.remove(requestId);
+        }
+        return result;
     }
 }

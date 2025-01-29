@@ -8,15 +8,19 @@ import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 
 @Component
-public class RequestResponseLoggingInterceptor implements HandlerInterceptor {
+public class LoggingInterceptor implements HandlerInterceptor {
+
+    private double totalTraffic = 0;
 
     @SuppressWarnings("null")
     @Override
-    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex) throws IOException {
+    public void afterCompletion(HttpServletRequest request, HttpServletResponse response, Object handler, Exception ex)
+            throws IOException {
         int requestSize = request.getContentLength();
         int responseSize = response.getBufferSize();
 
-        System.out.println("요청 크기: " + requestSize + " bytes");
-        System.out.println("응답 크기: " + responseSize + " bytes");
+        totalTraffic += ((requestSize > 0 ? requestSize : 0) + responseSize) / (1024.0 * 1024.0);
+
+        System.out.printf("누적 트래픽 크기: %.2f MB%n", totalTraffic);
     }
 }

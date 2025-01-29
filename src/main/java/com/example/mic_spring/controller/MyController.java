@@ -1,60 +1,82 @@
 package com.example.mic_spring.controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import com.example.mic_spring.domain.dto.*;
+import com.example.mic_spring.security.*;
+import com.example.mic_spring.service.*;
 
-import com.example.mic_spring.domain.dto.ApiResponse;
-import com.example.mic_spring.domain.dto.CodeDTO;
-import com.example.mic_spring.domain.dto.CodeResultDTO;
-import com.example.mic_spring.domain.dto.ContestScoreDTO;
-import com.example.mic_spring.domain.dto.ContestsAndProblemsDTO;
-import com.example.mic_spring.security.Token;
-import com.example.mic_spring.service.CodeService;
-import com.example.mic_spring.service.DataService;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
 
+import java.util.*;
+import java.util.concurrent.*;
 import jakarta.servlet.http.HttpServletRequest;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/data")
 public class MyController {
 
-    @Autowired
     private CodeService codeService;
-    @Autowired
     private DataService dataService;
+    private RequestQueueService requestQueueService;
+    private final Map<String, Future<? extends ApiResponse<?>>> requestResults = new ConcurrentHashMap<>();
+
+    public MyController(CodeService codeService, DataService dataService, RequestQueueService requestQueueService) {
+        this.codeService = codeService;
+        this.dataService = dataService;
+        this.requestQueueService = requestQueueService;
+    }
 
     @GetMapping("/filter")
-    public ResponseEntity<ApiResponse<ContestsAndProblemsDTO>> getAllFilterContestsAndProblems() {
-        ContestsAndProblemsDTO contestsAndProblems = dataService.getAllFilterContestsAndProblems();
-        ApiResponse<ContestsAndProblemsDTO> response = new ApiResponse<>(200, true, "대회 및 문제 조회 성공",
-                contestsAndProblems);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<ApiResponse<String>> getAllFilterContestsAndProblems() {
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<ContestsAndProblemsDTO>> future = requestQueueService.addRequest(() -> {
+            ContestsAndProblemsDTO contestsAndProblems = dataService.getAllFilterContestsAndProblems();
+            return new ApiResponse<>(200, true, "대회 및 문제 조회 성공", contestsAndProblems);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @GetMapping("/{contestId}")
-    public ResponseEntity<ApiResponse<List<ContestScoreDTO>>> getScoreBoardByContestId(
-            @PathVariable("contestId") Long contestId) {
-        List<ContestScoreDTO> contestScores = dataService.getScoreBoardByContestId(contestId);
-        ApiResponse<List<ContestScoreDTO>> response = new ApiResponse<>(200, true, "대회 아이디로 스코어보드 조회 성공",
-                contestScores);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<ApiResponse<String>> getScoreBoardByContestId(@PathVariable("contestId") Long contestId) {
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<List<ContestScoreDTO>>> future = requestQueueService.addRequest(() -> {
+            List<ContestScoreDTO> contestScores = dataService.getScoreBoardByContestId(contestId);
+            return new ApiResponse<>(200, true, "대회 아이디로 스코어보드 조회 성공",
+                    contestScores);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @PostMapping("/code")
-    public ResponseEntity<ApiResponse<CodeResultDTO>> runCode(@RequestBody CodeDTO codeDTO, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> runCode(@RequestBody CodeDTO codeDTO,
+            HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        CodeResultDTO result = codeService.runCode(codeDTO, token);
-        ApiResponse<CodeResultDTO> response = new ApiResponse<>(200, true, "코드 테스트 성공", result);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<CodeResultDTO>> future = requestQueueService.addRequest(() -> {
+            CodeResultDTO result = codeService.runCode(codeDTO, token);
+            return new ApiResponse<>(200, true, "코드 테스트 성공", result);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
+    }
+
+    @GetMapping("/result/{requestId}")
+    public ResponseEntity<ApiResponse<?>> getResult(@PathVariable("requestId") String requestId) {
+        Future<? extends ApiResponse<?>> future = requestResults.get(requestId);
+        ResponseEntity<ApiResponse<?>> result = requestQueueService.getResult(future);
+        ApiResponse<?> responseBody = Optional.ofNullable(result.getBody())
+                .orElseGet(() -> new ApiResponse<>(502, false, "서버 내부 오류", null));
+        if (responseBody.getStatus() == 200) {
+            requestResults.remove(requestId);
+        } else if (responseBody.getStatus() == 500) {
+            requestResults.remove(requestId);
+        }
+        return result;
     }
 }

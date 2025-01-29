@@ -1,50 +1,63 @@
 package com.example.mic_spring.controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import com.example.mic_spring.domain.dto.*;
+import com.example.mic_spring.domain.entity.*;
+import com.example.mic_spring.service.*;
 
-import com.example.mic_spring.domain.dto.ApiResponse;
-import com.example.mic_spring.domain.entity.Solve;
-import com.example.mic_spring.security.Token;
-import com.example.mic_spring.service.SolveService;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
 
-import jakarta.servlet.http.HttpServletRequest;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-
-import java.util.List;
+import java.util.*;
+import java.util.concurrent.*;
 
 @RestController
 @RequestMapping("/api/solves")
 public class SolveController {
     
-    @Autowired private SolveService solveService;
+    private SolveService solveService;
+    private RequestQueueService requestQueueService;
+    private final Map<String, Future<? extends ApiResponse<?>>> requestResults = new ConcurrentHashMap<>();
+
+    public SolveController(SolveService solveService, RequestQueueService requestQueueService) {
+        this.solveService = solveService;
+        this.requestQueueService = requestQueueService;
+    }
     
     @GetMapping("/users/{userId}")
-    public ResponseEntity<ApiResponse<List<Solve>>> getAllSolvesByUserId(@PathVariable("userId") String userId) {
-        List<Solve> solves = solveService.getAllSolvesByUserId(userId);
-        ApiResponse<List<Solve>> response = new ApiResponse<>(200, true, "해결 성공", solves);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<ApiResponse<String>> getAllSolvesByUserId(@PathVariable("userId") String userId) {
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<List<Solve>>> future = requestQueueService.addRequest(() -> {
+            List<Solve> solves = solveService.getAllSolvesByUserId(userId);
+            return new ApiResponse<>(200, true, "해결 성공", solves);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @GetMapping("/problem/{problemId}")
-    public ResponseEntity<ApiResponse<List<Solve>>> getAllSolvesByProblemId(@PathVariable("problemId") Long problemId) {
-        List<Solve> solves = solveService.getAllSolvesByProblemId(problemId);
-        ApiResponse<List<Solve>> response = new ApiResponse<>(200, true, "해결 성공", solves);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<ApiResponse<String>> getAllSolvesByProblemId(@PathVariable("problemId") Long problemId) {
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<List<Solve>>> future = requestQueueService.addRequest(() -> {
+            List<Solve> solves = solveService.getAllSolvesByProblemId(problemId);
+            return new ApiResponse<>(200, true, "해결 성공", solves);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
-    @PostMapping
-    public ResponseEntity<ApiResponse<Solve>> solveProblem(@RequestBody Solve solveDetail, HttpServletRequest request) {
-        Token token = (Token) request.getAttribute("token");
-        Solve solve = solveService.solveProblem(solveDetail, token);
-        ApiResponse<Solve> response = new ApiResponse<>(200, true, "해결 성공", solve);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    @GetMapping("/result/{requestId}")
+    public ResponseEntity<ApiResponse<?>> getResult(@PathVariable("requestId") String requestId) {
+        Future<? extends ApiResponse<?>> future = requestResults.get(requestId);
+        ResponseEntity<ApiResponse<?>> result = requestQueueService.getResult(future);
+        ApiResponse<?> responseBody = Optional.ofNullable(result.getBody())
+                .orElseGet(() -> new ApiResponse<>(502, false, "서버 내부 오류", null));
+        if (responseBody.getStatus() == 200) {
+            requestResults.remove(requestId);
+        } else if (responseBody.getStatus() == 500) {
+            requestResults.remove(requestId);
+        }
+        return result;
     }
 }

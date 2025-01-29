@@ -1,112 +1,189 @@
 package com.example.mic_spring.controller;
 
-import org.springframework.web.bind.annotation.RestController;
+import com.example.mic_spring.domain.dto.*;
+import com.example.mic_spring.domain.entity.*;
+import com.example.mic_spring.security.*;
+import com.example.mic_spring.service.*;
 
-import com.example.mic_spring.domain.dto.ApiResponse;
-import com.example.mic_spring.domain.dto.ProblemDTO;
-import com.example.mic_spring.domain.dto.ProblemListDTO;
-import com.example.mic_spring.domain.dto.ProblemScoreDTO;
-import com.example.mic_spring.domain.entity.Problem;
-import com.example.mic_spring.security.Token;
-import com.example.mic_spring.service.ProblemService;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.http.*;
 
+import java.util.*;
+import java.util.concurrent.*;
 import jakarta.servlet.http.HttpServletRequest;
-
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.PutMapping;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpStatus;
-
-import java.util.List;
 
 @RestController
 @RequestMapping("/api/problems")
 public class ProblemController {
 
-    @Autowired private ProblemService problemService;
+    private ProblemService problemService;
+    private RequestQueueService requestQueueService;
+    private final Map<String, Future<? extends ApiResponse<?>>> requestResults = new ConcurrentHashMap<>();
+
+    public ProblemController(ProblemService problemService, RequestQueueService requestQueueService) {
+        this.problemService = problemService;
+        this.requestQueueService = requestQueueService;
+    }
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<List<ProblemListDTO>>> getProblemList() {
-        List<ProblemListDTO> problems = problemService.getProblemList();
-        ApiResponse<List<ProblemListDTO>> response = new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+    public ResponseEntity<ApiResponse<String>> getProblemList() {
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<List<ProblemListDTO>>> future = requestQueueService.addRequest(() -> {
+            List<ProblemListDTO> problems = problemService.getProblemList();
+            return new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @GetMapping("/all/{userId}")
-    public ResponseEntity<ApiResponse<List<ProblemListDTO>>> getProblemListWithUserId(@PathVariable("userId") String userId, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> getProblemListWithUserId(@PathVariable("userId") String userId,
+            HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        List<ProblemListDTO> problems = problemService.getProblemListWithUserId(userId, token);
-        ApiResponse<List<ProblemListDTO>> response = new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<List<ProblemListDTO>>> future = requestQueueService.addRequest(() -> {
+            List<ProblemListDTO> problems = problemService.getProblemListWithUserId(userId, token);
+            return new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @GetMapping("/contest/{contestId}")
-    public ResponseEntity<ApiResponse<List<ProblemListDTO>>> getProblemListByContestId(@PathVariable("contestId") Long contestId, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> getProblemListByContestId(@PathVariable("contestId") Long contestId,
+            HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        List<ProblemListDTO> problems = problemService.getProblemListByContestId(contestId, token);
-        ApiResponse<List<ProblemListDTO>> response = new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problems);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<List<ProblemListDTO>>> future = requestQueueService.addRequest(() -> {
+            List<ProblemListDTO> problems = problemService.getProblemListByContestId(contestId, token);
+            return new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @GetMapping("/contest/{contestId}/{userId}")
-    public ResponseEntity<ApiResponse<List<ProblemListDTO>>> getProblemListByContestIdWithUserId(@PathVariable("contestId") Long contestId, @PathVariable("userId") String userId, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> getProblemListByContestIdWithUserId(
+            @PathVariable("contestId") Long contestId, @PathVariable("userId") String userId,
+            HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        List<ProblemListDTO> problems = problemService.getProblemListByContestIdWithUserId(contestId, userId, token);
-        ApiResponse<List<ProblemListDTO>> response = new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problems);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<List<ProblemListDTO>>> future = requestQueueService.addRequest(() -> {
+            List<ProblemListDTO> problems = problemService.getProblemListByContestIdWithUserId(contestId, userId,
+                    token);
+            return new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @GetMapping("/{id}")
-    public ResponseEntity<ApiResponse<Problem>> getProblemById(@PathVariable("id") Long id, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> getProblemById(@PathVariable("id") Long id, HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        Problem problem = problemService.getProblemById(id, token);
-        ApiResponse<Problem> response = new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problem);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<Problem>> future = requestQueueService.addRequest(() -> {
+            Problem problem = problemService.getProblemById(id, token);
+            return new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problem);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @GetMapping("/user/{userId}")
-    public ResponseEntity<ApiResponse<List<Problem>>> getAllProblemsByUserId(@PathVariable("userId") String userId, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> getAllProblemsByUserId(@PathVariable("userId") String userId,
+            HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        List<Problem> problems = problemService.getAllProblemsByUserId(userId, token);
-        ApiResponse<List<Problem>> response = new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problems);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<List<Problem>>> future = requestQueueService.addRequest(() -> {
+            List<Problem> problems = problemService.getAllProblemsByUserId(userId, token);
+            return new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problems);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @GetMapping("/solve/{userId}")
-    public ResponseEntity<ApiResponse<List<ProblemScoreDTO>>> getAllSolveProblemsByUserId(@PathVariable("userId") String userId, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> getAllSolveProblemsByUserId(
+            @PathVariable("userId") String userId, HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        List<ProblemScoreDTO> problemScores = problemService.getAllSolveProblemsByUserId(userId, token);
-        ApiResponse<List<ProblemScoreDTO>> response = new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problemScores);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<List<ProblemScoreDTO>>> future = requestQueueService.addRequest(() -> {
+            List<ProblemScoreDTO> problemScores = problemService.getAllSolveProblemsByUserId(userId, token);
+            return new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problemScores);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
+
     }
 
     @PostMapping("/create")
-    public ResponseEntity<ApiResponse<Problem>> createProblem(@RequestBody ProblemDTO problemDTO, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> createProblem(@RequestBody ProblemDTO problemDTO,
+            HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        Problem problem = problemService.createProblem(problemDTO, token);
-        ApiResponse<Problem> response = new ApiResponse<Problem>(200, true, "문제 생성 성공", problem);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<Problem>> future = requestQueueService.addRequest(() -> {
+            Problem problem = problemService.createProblem(problemDTO, token);
+            return new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problem);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @PutMapping("/update")
-    public ResponseEntity<ApiResponse<Problem>> updateProblem(@RequestBody ProblemDTO problemDTO, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> updateProblem(@RequestBody ProblemDTO problemDTO,
+            HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        Problem problem = problemService.updateProblem(problemDTO, token);
-        ApiResponse<Problem> response = new ApiResponse<Problem>(200, true, "문제 수정 성공", problem);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<Problem>> future = requestQueueService.addRequest(() -> {
+            Problem problem = problemService.updateProblem(problemDTO, token);
+            return new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problem);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
     @DeleteMapping("/{id}")
-    public ResponseEntity<ApiResponse<Void>> deleteProblem(@PathVariable("id") Long id, HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> deleteProblem(@PathVariable("id") Long id, HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
-        problemService.deleteProblem(id, token);
-        ApiResponse<Void> response = new ApiResponse<>(200, true, "문제 삭제 성공", null);
-        return ResponseEntity.status(HttpStatus.OK).body(response);
+
+        String requestId = UUID.randomUUID().toString();
+        Future<ApiResponse<Void>> future = requestQueueService.addRequest(() -> {
+            problemService.deleteProblem(id, token);
+            return new ApiResponse<>(200, true, "문제 삭제 성공", null);
+        });
+        requestResults.put(requestId, future);
+
+        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
+    }
+
+    @GetMapping("/result/{requestId}")
+    public ResponseEntity<ApiResponse<?>> getResult(@PathVariable("requestId") String requestId) {
+        Future<? extends ApiResponse<?>> future = requestResults.get(requestId);
+        ResponseEntity<ApiResponse<?>> result = requestQueueService.getResult(future);
+        ApiResponse<?> responseBody = Optional.ofNullable(result.getBody())
+                .orElseGet(() -> new ApiResponse<>(502, false, "서버 내부 오류", null));
+        if (responseBody.getStatus() == 200) {
+            requestResults.remove(requestId);
+        } else if (responseBody.getStatus() == 500) {
+            requestResults.remove(requestId);
+        }
+        return result;
     }
 }

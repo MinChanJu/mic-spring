@@ -28,13 +28,13 @@ public class Example {
     @Column(name = "problem_id", nullable = false)
     private Long problemId;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", columnDefinition = "TEXT", nullable = false)
     private String userId;
 
-    @Column(name = "example_input", nullable = false)
+    @Column(name = "example_input", columnDefinition = "TEXT", nullable = false)
     private String exampleInput;
 
-    @Column(name = "example_output", nullable = false)
+    @Column(name = "example_output", columnDefinition = "TEXT", nullable = false)
     private String exampleOutput;
 
     @Column(name = "created_at", nullable = false)

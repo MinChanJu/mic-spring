@@ -1,15 +1,12 @@
 package com.example.mic_spring.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
 
-import com.example.mic_spring.domain.entity.Example;
-import com.example.mic_spring.domain.entity.Problem;
-import com.example.mic_spring.exception.CustomException;
-import com.example.mic_spring.exception.ErrorCode;
-import com.example.mic_spring.repository.ExampleRepository;
-import com.example.mic_spring.repository.ProblemRepository;
-import com.example.mic_spring.security.Token;
+import com.example.mic_spring.domain.entity.*;
+import com.example.mic_spring.exception.*;
+import com.example.mic_spring.repository.*;
+import com.example.mic_spring.security.*;
+
+import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
@@ -17,10 +14,13 @@ import java.util.Optional;
 @Service
 public class ExampleService {
 
-    @Autowired
     private ExampleRepository exampleRepository;
-    @Autowired
     private ProblemRepository problemRepository;
+
+    public ExampleService(ExampleRepository exampleRepository, ProblemRepository problemRepository) {
+        this.exampleRepository = exampleRepository;
+        this.problemRepository = problemRepository;
+    }
 
     public List<Example> getAllExamples(Token token) {
         if (token.getAuthority() != 5) throw new CustomException(ErrorCode.UNAUTHORIZED);

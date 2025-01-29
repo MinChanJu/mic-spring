@@ -28,16 +28,16 @@ public class Contest {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", columnDefinition = "TEXT", nullable = false)
     private String userId;
 
-    @Column(name = "contest_name", nullable = false)
+    @Column(name = "contest_name", columnDefinition = "TEXT", nullable = false)
     private String contestName;
 
-    @Column(name = "contest_description", nullable = false)
+    @Column(name = "contest_description", columnDefinition = "TEXT", nullable = false)
     private String contestDescription;
 
-    @Column(name = "contest_pw")
+    @Column(name = "contest_pw", columnDefinition = "TEXT")
     private String contestPw;
 
     @Column(name = "start_time")

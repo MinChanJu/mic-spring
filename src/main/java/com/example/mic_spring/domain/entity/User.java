@@ -28,19 +28,19 @@ public class User {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Column(name = "name", nullable = false)
+    @Column(name = "name", columnDefinition = "TEXT", nullable = false)
     private String name;
 
-    @Column(name = "user_id", nullable = false)
+    @Column(name = "user_id", columnDefinition = "TEXT", nullable = false)
     private String userId;
 
-    @Column(name = "user_pw", nullable = false)
+    @Column(name = "user_pw", columnDefinition = "TEXT", nullable = false)
     private String userPw;
 
-    @Column(name = "phone", nullable = false)
+    @Column(name = "phone", columnDefinition = "TEXT", nullable = false)
     private String phone;
 
-    @Column(name = "email", nullable = false)
+    @Column(name = "email", columnDefinition = "TEXT", nullable = false)
     private String email;
 
     @Column(name = "authority", nullable = false)

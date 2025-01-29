@@ -1,32 +1,24 @@
 package com.example.mic_spring.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.mic_spring.domain.dto.*;
+import com.example.mic_spring.domain.entity.*;
+import com.example.mic_spring.exception.*;
+import com.example.mic_spring.repository.*;
+import com.example.mic_spring.security.*;
+
 import org.springframework.stereotype.Service;
 
-import com.example.mic_spring.domain.dto.UserDTO;
-import com.example.mic_spring.domain.dto.UserLoginDTO;
-import com.example.mic_spring.domain.dto.UserResponseDTO;
-import com.example.mic_spring.domain.entity.Contest;
-import com.example.mic_spring.domain.entity.User;
-import com.example.mic_spring.exception.CustomException;
-import com.example.mic_spring.exception.ErrorCode;
-import com.example.mic_spring.repository.UserRepository;
-import com.example.mic_spring.security.JwtUtil;
-import com.example.mic_spring.security.Token;
-
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class UserService {
 
-    @Autowired
     private UserRepository userRepository;
     private ContestService contestService;
     private JwtUtil jwtUtil;
 
-    public UserService(ContestService contestService, JwtUtil jwtUtil) {
+    public UserService(UserRepository userRepository, ContestService contestService, JwtUtil jwtUtil) {
+        this.userRepository = userRepository;
         this.contestService = contestService;
         this.jwtUtil = jwtUtil;
     }
@@ -72,7 +64,7 @@ public class UserService {
         if (token.getAuthority() == null)
             throw new CustomException(ErrorCode.UNAUTHORIZED);
 
-        Contest contest = contestService.getContestById(contestId);
+        ContestListDTO contest = contestService.getContestById(contestId);
         if (!token.getUserId().equals(contest.getUserId()) && token.getAuthority() != 5)
             throw new CustomException(ErrorCode.UNAUTHORIZED);
 

@@ -1,21 +1,22 @@
 package com.example.mic_spring.service;
 
-import org.springframework.beans.factory.annotation.Autowired;
+import com.example.mic_spring.domain.entity.*;
+import com.example.mic_spring.exception.*;
+import com.example.mic_spring.repository.*;
+import com.example.mic_spring.security.*;
+
 import org.springframework.stereotype.Service;
 
-import com.example.mic_spring.domain.entity.Solve;
-import com.example.mic_spring.exception.CustomException;
-import com.example.mic_spring.exception.ErrorCode;
-import com.example.mic_spring.repository.SolveRepository;
-import com.example.mic_spring.security.Token;
-
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class SolveService {
     
-    @Autowired private SolveRepository solveRepository;
+    private SolveRepository solveRepository;
+
+    public SolveService(SolveRepository solveRepository) {
+        this.solveRepository = solveRepository;
+    }
 
     public Solve getSolveByUserIdAndProblemId(String userId, Long problemId) {
         if (userId == null || problemId == null) throw new CustomException(ErrorCode.SOLVE_NOT_FOUND);
