@@ -7,6 +7,7 @@ import com.example.mic_spring.repository.*;
 import com.example.mic_spring.security.*;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.time.ZonedDateTime;
@@ -20,6 +21,7 @@ public class ContestService {
         this.contestRepository = contestRepository;
     }
 
+    @Transactional(readOnly = true)
     public List<ContestListDTO> getContestList() {
         List<Contest> contests = contestRepository.findAllOrderByStartTimeDescOrCreatedAtDesc();
         List<ContestListDTO> contestList = new ArrayList<>();
@@ -40,6 +42,7 @@ public class ContestService {
         return contestList;
     }
 
+    @Transactional(readOnly = true)
     public List<ContestListDTO> getContestListByUserId(String userId, Token token) {
         if (!token.getUserId().equals(userId))
             throw new CustomException(ErrorCode.UNAUTHORIZED);
@@ -60,6 +63,7 @@ public class ContestService {
         return contestList;
     }
 
+    @Transactional(readOnly = true)
     public ContestListDTO getContestById(Long id) {
         if (id == null)
             throw new CustomException(ErrorCode.CONTEST_NOT_FOUND);
@@ -80,6 +84,7 @@ public class ContestService {
         return new ContestListDTO(idx, contestId, contestName, contestDescription, userId, startTime, endTime);
     }
 
+    @Transactional(readOnly = true)
     public String getContestNameById(Long id) {
         if (id == null)
             return "이 문제는 대회에 속하지 않습니다.";
@@ -89,20 +94,7 @@ public class ContestService {
         return contest.get().getContestName();
     }
 
-    // public List<Contest> getAllContests() {
-    // List<Contest> contests = contestRepository.findAll();
-    // contests.sort((a, b) -> {
-    // if (a.getStartTime() == null && b.getStartTime() == null)
-    // return a.getCreatedAt().isBefore(b.getCreatedAt()) ? 1 : -1;
-    // else if (a.getStartTime() == null)
-    // return 1;
-    // else if (b.getStartTime() == null)
-    // return -1;
-    // return a.getStartTime().isBefore(b.getStartTime()) ? 1 : -1;
-    // });
-    // return contests;
-    // }
-
+    @Transactional
     public Contest createContest(Contest contest, Token token) {
         if (contestRepository.existsByContestName(contest.getContestName()))
             throw new CustomException(ErrorCode.DUPLICATE_CONTEST_NAME);
@@ -114,6 +106,7 @@ public class ContestService {
         return contestRepository.save(contest);
     }
 
+    @Transactional
     public Contest updateContest(Contest contest, Token token) {
         if (contest.getId() == null)
             throw new CustomException(ErrorCode.CONTEST_NOT_FOUND);
@@ -128,6 +121,7 @@ public class ContestService {
         return contestRepository.save(contest);
     }
 
+    @Transactional
     public void deleteContest(Long id, Token token) {
         if (id == null)
             throw new CustomException(ErrorCode.CONTEST_NOT_FOUND);

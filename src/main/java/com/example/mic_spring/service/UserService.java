@@ -7,6 +7,7 @@ import com.example.mic_spring.repository.*;
 import com.example.mic_spring.security.*;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 
@@ -23,6 +24,7 @@ public class UserService {
         this.jwtUtil = jwtUtil;
     }
 
+    @Transactional(readOnly = true)
     public User getUserById(Long id) {
         if (id == null)
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -33,6 +35,7 @@ public class UserService {
         return user.get();
     }
 
+    @Transactional(readOnly = true)
     public UserDTO getUserByUserId(String userId) {
         Optional<User> user = userRepository.findByUserId(userId);
         if (user.isEmpty())
@@ -42,6 +45,7 @@ public class UserService {
         return userDTO;
     }
 
+    @Transactional(readOnly = true)
     public UserResponseDTO getUserByUserIdAndUserPw(UserLoginDTO userLoginDTO) {
         String userId = userLoginDTO.getUserId(), userPw = userLoginDTO.getUserPw();
         Optional<User> findUser = userRepository.findByUserIdAndUserPw(userId, userPw);
@@ -52,12 +56,14 @@ public class UserService {
         return new UserResponseDTO(user, jwtUtil.generateToken(userId, user.getAuthority(), user.getContestId()));
     }
 
+    @Transactional(readOnly = true)
     public List<User> getAllUsers(Token token) {
         if (token.getAuthority() != 5)
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         return userRepository.findAll();
     }
 
+    @Transactional(readOnly = true)
     public List<User> getAllUsersByContestId(Long contestId, Token token) {
         if (token.getUserId() == null)
             throw new CustomException(ErrorCode.UNAUTHORIZED);
@@ -71,6 +77,7 @@ public class UserService {
         return userRepository.findByContestId(contestId);
     }
 
+    @Transactional(readOnly = true)
     public List<UserDTO> getAllUserDTOsByContestId(Long contestId) {
         List<User> users = userRepository.findByContestId(contestId);
         List<UserDTO> userDTOs = new ArrayList<>();
@@ -80,6 +87,7 @@ public class UserService {
         return userDTOs;
     }
 
+    @Transactional
     public User createUser(User user) {
         if (userRepository.existsByUserId(user.getUserId()))
             throw new CustomException(ErrorCode.DUPLICATE_USER_ID);
@@ -97,6 +105,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
     public User updateUser(User user, Token token) {
         if (user.getId() == null)
             throw new CustomException(ErrorCode.USER_NOT_FOUND);
@@ -115,6 +124,7 @@ public class UserService {
         return userRepository.save(user);
     }
 
+    @Transactional
     public void deleteUser(Long id, Token token) {
         if (id == null)
             throw new CustomException(ErrorCode.USER_NOT_FOUND);

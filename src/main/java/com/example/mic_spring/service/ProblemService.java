@@ -7,6 +7,7 @@ import com.example.mic_spring.repository.*;
 import com.example.mic_spring.security.*;
 
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.*;
 import java.time.ZonedDateTime;
@@ -27,6 +28,7 @@ public class ProblemService {
         this.solveService = solveService;
     }
 
+    @Transactional(readOnly = true)
     public Problem getProblemById(Long id, Token token) {
         if (id == null)
             throw new CustomException(ErrorCode.PROBLEM_NOT_FOUND);
@@ -51,10 +53,12 @@ public class ProblemService {
         return problem;
     }
 
+    @Transactional(readOnly = true)
     public List<Problem> getAllProblems() {
         return problemRepository.findAllByOrderByIdAsc();
     }
 
+    @Transactional(readOnly = true)
     public List<ProblemListDTO> getProblemList() {
         List<Problem> problems = problemRepository.findAllByOrderByIdAsc();
         List<ProblemListDTO> problemList = new ArrayList<>();
@@ -79,6 +83,7 @@ public class ProblemService {
         return problemList;
     }
 
+    @Transactional(readOnly = true)
     public List<ProblemListDTO> getProblemListWithUserId(String userId, Token token) {
         if (!token.getUserId().equals(userId))
             return getProblemList();
@@ -112,6 +117,7 @@ public class ProblemService {
         return problemList;
     }
 
+    @Transactional(readOnly = true)
     public Problem existsById(Long id) {
         if (id == null)
             return null;
@@ -121,6 +127,7 @@ public class ProblemService {
         return findProblem.get();
     }
 
+    @Transactional(readOnly = true)
     public List<ProblemListDTO> getProblemListByContestId(Long contestId, Token token) {
         ContestListDTO contest = contestService.getContestById(contestId);
         if (!contest.getUserId().equals(token.getUserId()) && token.getAuthority() != 5) {
@@ -148,6 +155,7 @@ public class ProblemService {
         return problemList;
     }
 
+    @Transactional(readOnly = true)
     public List<ProblemListDTO> getProblemListByContestIdWithUserId(Long contestId, String userId, Token token) {
         if (!token.getUserId().equals(userId) && token.getAuthority() != 5)
             throw new CustomException(ErrorCode.UNAUTHORIZED);
@@ -171,16 +179,19 @@ public class ProblemService {
         return problemList;
     }
 
+    @Transactional(readOnly = true)
     public List<Problem> getAllProblemsByContestId(Long contestId) {
         return problemRepository.findByContestIdOrderByIdAsc(contestId);
     }
 
+    @Transactional(readOnly = true)
     public List<Problem> getAllProblemsByUserId(String userId, Token token) {
         if (!token.getUserId().equals(userId))
             throw new CustomException(ErrorCode.UNAUTHORIZED);
         return problemRepository.findByUserIdOrderByIdAsc(userId);
     }
 
+    @Transactional(readOnly = true)
     public List<ProblemScoreDTO> getAllSolveProblemsByUserId(String userId, Token token) {
         if (!token.getUserId().equals(userId))
             throw new CustomException(ErrorCode.UNAUTHORIZED);
@@ -199,6 +210,7 @@ public class ProblemService {
         return problemScores;
     }
 
+    @Transactional
     public Problem createProblem(ProblemDTO problemDTO, Token token) {
 
         Problem problem = problemDTO.getProblem();
@@ -222,6 +234,7 @@ public class ProblemService {
         return curProblem;
     }
 
+    @Transactional
     public Problem updateProblem(ProblemDTO problemDTO, Token token) {
         Problem problem = problemDTO.getProblem();
         List<Example> examples = problemDTO.getExamples();
@@ -244,6 +257,7 @@ public class ProblemService {
         return problemRepository.save(problem);
     }
 
+    @Transactional
     public void deleteProblem(Long id, Token token) {
         if (id == null)
             throw new CustomException(ErrorCode.PROBLEM_NOT_FOUND);
