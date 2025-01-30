@@ -29,7 +29,7 @@ public class ProblemService {
     }
 
     @Transactional(readOnly = true)
-    public Problem getProblemById(Long id, Token token) {
+    public ProblemScoreDTO getProblemById(Long id, Token token) {
         if (id == null)
             throw new CustomException(ErrorCode.PROBLEM_NOT_FOUND);
         Optional<Problem> findProblem = problemRepository.findById(id);
@@ -50,7 +50,12 @@ public class ProblemService {
             }
         }
 
-        return problem;
+        Short score = -1;
+        Solve solve = solveService.existSolveByUserIdAndProblemId(token.getUserId(), id);
+        if (solve != null)
+            score = solve.getScore();
+
+        return new ProblemScoreDTO(problem, score);
     }
 
     @Transactional(readOnly = true)
@@ -59,35 +64,9 @@ public class ProblemService {
     }
 
     @Transactional(readOnly = true)
-    public List<ProblemListDTO> getProblemList() {
-        List<Problem> problems = problemRepository.findAllByOrderByIdAsc();
-        List<ProblemListDTO> problemList = new ArrayList<>();
-
-        Long id = 1L;
-
-        for (Problem problem : problems) {
-            Long problemId = problem.getId();
-            if (problem.getContestId() != null) {
-                ContestListDTO contest = contestService.getContestById(problem.getContestId());
-                if (contest.getStartTime() != null && contest.getStartTime().isAfter(ZonedDateTime.now()))
-                    continue;
-                if (contest.getEndTime() != null && contest.getEndTime().isAfter(ZonedDateTime.now()))
-                    continue;
-            }
-            String problemName = problem.getProblemName();
-            String contestName = contestService.getContestNameById(problem.getContestId());
-            Short score = -1;
-            problemList.add(new ProblemListDTO(id++, problemId, problemName, contestName, score));
-        }
-
-        return problemList;
-    }
-
-    @Transactional(readOnly = true)
-    public List<ProblemListDTO> getProblemListWithUserId(String userId, Token token) {
-        if (!token.getUserId().equals(userId))
-            return getProblemList();
-        List<Solve> solves = solveService.getAllSolvesByUserIdOrderByProblemIdAsc(userId);
+    public List<ProblemListDTO> getProblemList(Token token) {
+        List<Solve> solves = token.getUserId().equals("") ? new ArrayList<>()
+                : solveService.getAllSolvesByUserIdOrderByProblemIdAsc(token.getUserId());
         List<Problem> problems = problemRepository.findAllByOrderByIdAsc();
         List<ProblemListDTO> problemList = new ArrayList<>();
 
@@ -139,26 +118,6 @@ public class ProblemService {
                     throw new CustomException(ErrorCode.UNAUTHORIZED);
             }
         }
-        List<Problem> problems = problemRepository.findByContestIdOrderByIdAsc(contestId);
-        List<ProblemListDTO> problemList = new ArrayList<>();
-
-        Long id = 1L;
-
-        for (Problem problem : problems) {
-            Long problemId = problem.getId();
-            String problemName = problem.getProblemName();
-            String contestName = contestService.getContestNameById(problem.getContestId());
-            Short score = -1;
-            problemList.add(new ProblemListDTO(id++, problemId, problemName, contestName, score));
-        }
-
-        return problemList;
-    }
-
-    @Transactional(readOnly = true)
-    public List<ProblemListDTO> getProblemListByContestIdWithUserId(Long contestId, String userId, Token token) {
-        if (!token.getUserId().equals(userId) && token.getAuthority() != 5)
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
 
         List<Problem> problems = problemRepository.findByContestIdOrderByIdAsc(contestId);
         List<ProblemListDTO> problemList = new ArrayList<>();
@@ -170,7 +129,7 @@ public class ProblemService {
             String problemName = problem.getProblemName();
             String contestName = contestService.getContestNameById(problem.getContestId());
             Short score = -1;
-            Solve solve = solveService.existSolveByUserIdAndProblemId(userId, problemId);
+            Solve solve = solveService.existSolveByUserIdAndProblemId(token.getUserId(), problemId);
             if (solve != null)
                 score = solve.getScore();
             problemList.add(new ProblemListDTO(id++, problemId, problemName, contestName, score));
@@ -202,10 +161,8 @@ public class ProblemService {
             if (findProblem.isEmpty())
                 continue;
             Problem problem = findProblem.get();
-            Long problemId = problem.getId();
-            String problemName = problem.getProblemName();
             Short score = solve.getScore();
-            problemScores.add(new ProblemScoreDTO(problemId, problemName, score));
+            problemScores.add(new ProblemScoreDTO(problem, score));
         }
         return problemScores;
     }

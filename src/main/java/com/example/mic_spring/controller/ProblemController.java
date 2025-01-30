@@ -26,25 +26,12 @@ public class ProblemController {
     }
 
     @GetMapping("/all")
-    public ResponseEntity<ApiResponse<String>> getProblemList() {
-        String requestId = UUID.randomUUID().toString();
-        Future<ApiResponse<List<ProblemListDTO>>> future = requestQueueService.addRequest(() -> {
-            List<ProblemListDTO> problems = problemService.getProblemList();
-            return new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
-        });
-        requestResults.put(requestId, future);
-
-        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
-    }
-
-    @GetMapping("/all/{userId}")
-    public ResponseEntity<ApiResponse<String>> getProblemListWithUserId(@PathVariable("userId") String userId,
-            HttpServletRequest request) {
+    public ResponseEntity<ApiResponse<String>> getProblemList(HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
 
         String requestId = UUID.randomUUID().toString();
         Future<ApiResponse<List<ProblemListDTO>>> future = requestQueueService.addRequest(() -> {
-            List<ProblemListDTO> problems = problemService.getProblemListWithUserId(userId, token);
+            List<ProblemListDTO> problems = problemService.getProblemList(token);
             return new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
         });
         requestResults.put(requestId, future);
@@ -67,30 +54,13 @@ public class ProblemController {
         return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
-    @GetMapping("/contest/{contestId}/{userId}")
-    public ResponseEntity<ApiResponse<String>> getProblemListByContestIdWithUserId(
-            @PathVariable("contestId") Long contestId, @PathVariable("userId") String userId,
-            HttpServletRequest request) {
-        Token token = (Token) request.getAttribute("token");
-
-        String requestId = UUID.randomUUID().toString();
-        Future<ApiResponse<List<ProblemListDTO>>> future = requestQueueService.addRequest(() -> {
-            List<ProblemListDTO> problems = problemService.getProblemListByContestIdWithUserId(contestId, userId,
-                    token);
-            return new ApiResponse<>(200, true, "모든 문제 조회 성공", problems);
-        });
-        requestResults.put(requestId, future);
-
-        return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
-    }
-
     @GetMapping("/{id}")
     public ResponseEntity<ApiResponse<String>> getProblemById(@PathVariable("id") Long id, HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
 
         String requestId = UUID.randomUUID().toString();
-        Future<ApiResponse<Problem>> future = requestQueueService.addRequest(() -> {
-            Problem problem = problemService.getProblemById(id, token);
+        Future<ApiResponse<ProblemScoreDTO>> future = requestQueueService.addRequest(() -> {
+            ProblemScoreDTO problem = problemService.getProblemById(id, token);
             return new ApiResponse<>(200, true, "문제 아이디로 조회 성공", problem);
         });
         requestResults.put(requestId, future);

@@ -2,6 +2,7 @@ package com.example.mic_spring.service;
 
 import com.example.mic_spring.domain.dto.*;
 import com.example.mic_spring.domain.entity.*;
+import com.example.mic_spring.security.Token;
 
 import org.springframework.stereotype.Service;
 
@@ -23,22 +24,24 @@ public class DataService {
     this.userService = userService;
   }
 
-  public List<ContestScoreDTO> getScoreBoardByContestId(Long contestId) {
-    List<Problem> problems = problemService.getAllProblemsByContestId(contestId);
+  public ScoreBoardDTO getScoreBoardByContestId(Long contestId, Token token) {
+    ContestListDTO contest = contestService.getContestById(contestId);
+    List<ProblemListDTO> problemList = problemService.getProblemListByContestId(contestId, token);
     List<UserDTO> participants = userService.getAllUserDTOsByContestId(contestId);
 
     List<ContestScoreDTO> contestScores = new ArrayList<>();
     for (UserDTO user : participants) {
       List<SubmitDTO> solveProblems = new ArrayList<>();
-      for (Problem problem : problems) {
-        Solve solve = solveService.existSolveByUserIdAndProblemId(user.getUserId(), problem.getId());
+      for (ProblemListDTO problem : problemList) {
+        Solve solve = solveService.existSolveByUserIdAndProblemId(user.getUserId(), problem.getProblemId());
         if (solve == null)
-          solveProblems.add(new SubmitDTO(problem.getId(), (short) 0));
+          solveProblems.add(new SubmitDTO(problem.getProblemId(), (short) 0));
         else
-          solveProblems.add(new SubmitDTO(problem.getId(), solve.getScore()));
+          solveProblems.add(new SubmitDTO(problem.getProblemId(), solve.getScore()));
       }
-      contestScores.add(new ContestScoreDTO(user.getName(), solveProblems));
+      contestScores.add(new ContestScoreDTO(-1L, user.getName(), solveProblems));
     }
+
     contestScores.sort((a, b) -> {
       int sumA = 0, sumB = 0;
       for (SubmitDTO submit : a.getSolveProblems())
@@ -47,12 +50,17 @@ public class DataService {
         sumB += submit.getScore();
       return sumB - sumA;
     });
-    return contestScores;
+
+    Long id = 1L;
+    for (ContestScoreDTO contestScore : contestScores)
+      contestScore.setId(id++);
+
+    return new ScoreBoardDTO(contest, problemList, contestScores);
   }
 
-  public ContestsAndProblemsDTO getAllFilterContestsAndProblems() {
+  public ContestsAndProblemsDTO getAllFilterContestsAndProblems(Token token) {
     List<ContestListDTO> contests = contestService.getContestList();
-    List<ProblemListDTO> problems = problemService.getProblemList();
+    List<ProblemListDTO> problems = problemService.getProblemList(token);
     ContestsAndProblemsDTO contestsAndProblems = new ContestsAndProblemsDTO(contests, problems);
     return contestsAndProblems;
   }

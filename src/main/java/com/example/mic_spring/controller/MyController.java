@@ -27,10 +27,12 @@ public class MyController {
     }
 
     @GetMapping("/filter")
-    public ResponseEntity<ApiResponse<String>> getAllFilterContestsAndProblems() {
+    public ResponseEntity<ApiResponse<String>> getAllFilterContestsAndProblems(HttpServletRequest request) {
+        Token token = (Token) request.getAttribute("token");
+
         String requestId = UUID.randomUUID().toString();
         Future<ApiResponse<ContestsAndProblemsDTO>> future = requestQueueService.addRequest(() -> {
-            ContestsAndProblemsDTO contestsAndProblems = dataService.getAllFilterContestsAndProblems();
+            ContestsAndProblemsDTO contestsAndProblems = dataService.getAllFilterContestsAndProblems(token);
             return new ApiResponse<>(200, true, "대회 및 문제 조회 성공", contestsAndProblems);
         });
         requestResults.put(requestId, future);
@@ -39,10 +41,13 @@ public class MyController {
     }
 
     @GetMapping("/{contestId}")
-    public ResponseEntity<ApiResponse<String>> getScoreBoardByContestId(@PathVariable("contestId") Long contestId) {
+    public ResponseEntity<ApiResponse<String>> getScoreBoardByContestId(@PathVariable("contestId") Long contestId,
+            HttpServletRequest request) {
+        Token token = (Token) request.getAttribute("token");
+
         String requestId = UUID.randomUUID().toString();
-        Future<ApiResponse<List<ContestScoreDTO>>> future = requestQueueService.addRequest(() -> {
-            List<ContestScoreDTO> contestScores = dataService.getScoreBoardByContestId(contestId);
+        Future<ApiResponse<ScoreBoardDTO>> future = requestQueueService.addRequest(() -> {
+            ScoreBoardDTO contestScores = dataService.getScoreBoardByContestId(contestId, token);
             return new ApiResponse<>(200, true, "대회 아이디로 스코어보드 조회 성공",
                     contestScores);
         });

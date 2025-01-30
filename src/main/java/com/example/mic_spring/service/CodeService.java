@@ -33,20 +33,16 @@ public class CodeService {
     String lang = codeDTO.getLang();
     Long problemId = codeDTO.getProblemId();
 
-    Problem problem = problemService.getProblemById(problemId, token);
+    ProblemScoreDTO problem = problemService.getProblemById(problemId, token);
     List<Example> examples = exampleService.getAllExamplesByProblemId(problemId);
 
-    String result = runCode(code, lang, problem, examples);
+    String result = runCode(code, lang, problem.getProblem(), examples);
 
     Solve solve = new Solve(null, userId, problemId, (short) 0, lang, code, ZonedDateTime.now());
-    if (result.matches("[+-]?\\d*(\\.\\d+)?"))
-      solve.setScore((short) (Double.parseDouble(result) * 10));
+    if (result.matches("[+-]?\\d*(\\.\\d+)?")) solve.setScore((short) (Double.parseDouble(result) * 10));
+    if (problem.getScore() < solve.getScore()) solveService.solveProblem(solve, token);
 
-    solveService.solveProblem(solve, token);
-
-    List<Solve> solves = solveService.getAllSolvesByUserId(userId);
-
-    return new CodeResultDTO(result, solves);
+    return new CodeResultDTO(result, (short) Math.max(problem.getScore(), solve.getScore()));
   }
 
   public String runCode(String code, String lang, Problem problem, List<Example> examples) {

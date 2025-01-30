@@ -43,10 +43,8 @@ public class ContestService {
     }
 
     @Transactional(readOnly = true)
-    public List<ContestListDTO> getContestListByUserId(String userId, Token token) {
-        if (!token.getUserId().equals(userId))
-            throw new CustomException(ErrorCode.UNAUTHORIZED);
-        List<Contest> contests = contestRepository.findByUserIdOrderByIdAsc(userId);
+    public List<ContestListDTO> getContestListForUserId(Token token) {
+        List<Contest> contests = contestRepository.findByUserIdOrderByIdAsc(token.getUserId());
         List<ContestListDTO> contestList = new ArrayList<>();
 
         Long idx = 1L;
@@ -55,6 +53,7 @@ public class ContestService {
             Long contestId = contest.getId();
             String contestName = contest.getContestName();
             String contestDescription = contest.getContestDescription();
+            String userId = contest.getUserId();
             ZonedDateTime startTime = contest.getStartTime();
             ZonedDateTime endTime = contest.getEndTime();
             contestList.add(

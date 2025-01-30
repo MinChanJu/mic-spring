@@ -37,14 +37,13 @@ public class ContestController {
         return ResponseEntity.ok(new ApiResponse<>(200, true, "요청이 처리 중입니다.", requestId));
     }
 
-    @GetMapping("/all/{userId}")
-    public ResponseEntity<ApiResponse<String>> getContestListByUserId(@PathVariable("userId") String userId,
-            HttpServletRequest request) {
+    @GetMapping("/user")
+    public ResponseEntity<ApiResponse<String>> getContestListForUserId(HttpServletRequest request) {
         Token token = (Token) request.getAttribute("token");
 
         String requestId = UUID.randomUUID().toString();
         Future<ApiResponse<List<ContestListDTO>>> future = requestQueueService.addRequest(() -> {
-            List<ContestListDTO> contests = contestService.getContestListByUserId(userId, token);
+            List<ContestListDTO> contests = contestService.getContestListForUserId(token);
             return new ApiResponse<>(200, true, "회원 아이디로 조회 성공", contests);
         });
         requestResults.put(requestId, future);
