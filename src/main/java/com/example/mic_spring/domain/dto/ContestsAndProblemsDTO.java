@@ -12,6 +12,6 @@ import java.util.List;
 @Getter
 @Setter
 public class ContestsAndProblemsDTO {
-    private List<ContestListDTO> contests;
-    private List<ProblemListDTO> problems;
+  private List<ContestListDTO> contests;
+  private List<ProblemListDTO> problems;
 }

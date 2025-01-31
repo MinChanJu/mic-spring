@@ -9,24 +9,25 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
 
-    private LoggingInterceptor loggingInterceptor;
+  private LoggingInterceptor loggingInterceptor;
 
-    public WebConfig(LoggingInterceptor loggingInterceptor) {
-        this.loggingInterceptor = loggingInterceptor;
-    }
+  public WebConfig(LoggingInterceptor loggingInterceptor) {
+    this.loggingInterceptor = loggingInterceptor;
+  }
 
-    @SuppressWarnings("null")
-    @Override
-    public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loggingInterceptor);
-    }
+  @SuppressWarnings("null")
+  @Override
+  public void addInterceptors(InterceptorRegistry registry) {
+    registry.addInterceptor(loggingInterceptor);
+  }
 
-    @Override
-    public void addCorsMappings(@NonNull CorsRegistry registry) {
-        registry.addMapping("/**")
-                .allowedOrigins("https://minchanju.github.io", "https://mathematicsincoding.netlify.app", "http://localhost:5173")
-                .allowedMethods("GET", "POST", "PUT", "DELETE")
-                .allowedHeaders("*")
-                .allowCredentials(true);
-    }
+  @Override
+  public void addCorsMappings(@NonNull CorsRegistry registry) {
+    registry.addMapping("/**")
+        .allowedOrigins("https://minchanju.github.io", "https://mathematicsincoding.netlify.app",
+            "http://localhost:5173")
+        .allowedMethods("GET", "POST", "PUT", "DELETE")
+        .allowedHeaders("*")
+        .allowCredentials(true);
+  }
 }

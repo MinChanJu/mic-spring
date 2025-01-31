@@ -12,11 +12,11 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ContestListDTO {
-    private Long id;
-    private Long contestId;
-    private String contestName;
-    private String contestDescription;
-    private String userId;
-    private ZonedDateTime startTime;
-    private ZonedDateTime endTime;
+  private Long id;
+  private Long contestId;
+  private String contestName;
+  private String contestDescription;
+  private String userId;
+  private ZonedDateTime startTime;
+  private ZonedDateTime endTime;
 }

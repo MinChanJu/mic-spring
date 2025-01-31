@@ -10,7 +10,7 @@ import lombok.Setter;
 @Getter
 @Setter
 public class Token {
-    private String userId;
-    private Short authority;
-    private Long contestId;
+  private String userId;
+  private Short authority;
+  private Long contestId;
 }

@@ -10,8 +10,11 @@ import java.util.Optional;
 
 @Repository
 public interface UserRepository extends JpaRepository<User, Long> {
-    Optional<User> findByUserId(String userId);
-    List<User> findByContestId(Long contestId);
-    Optional<User> findByUserIdAndUserPw(String userId, String userPw);
-    boolean existsByUserId(String userId);
+  Optional<User> findByUserId(String userId);
+
+  List<User> findByContestId(Long contestId);
+
+  Optional<User> findByUserIdAndUserPw(String userId, String userPw);
+
+  boolean existsByUserId(String userId);
 }

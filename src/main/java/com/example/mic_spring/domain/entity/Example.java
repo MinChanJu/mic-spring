@@ -21,22 +21,22 @@ import java.time.ZonedDateTime;
 @Entity
 @Table(name = "examples")
 public class Example {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "problem_id", nullable = false)
-    private Long problemId;
+  @Column(name = "problem_id", nullable = false)
+  private Long problemId;
 
-    @Column(name = "user_id", columnDefinition = "TEXT", nullable = false)
-    private String userId;
+  @Column(name = "user_id", columnDefinition = "TEXT", nullable = false)
+  private String userId;
 
-    @Column(name = "example_input", columnDefinition = "TEXT", nullable = false)
-    private String exampleInput;
+  @Column(name = "example_input", columnDefinition = "TEXT", nullable = false)
+  private String exampleInput;
 
-    @Column(name = "example_output", columnDefinition = "TEXT", nullable = false)
-    private String exampleOutput;
+  @Column(name = "example_output", columnDefinition = "TEXT", nullable = false)
+  private String exampleOutput;
 
-    @Column(name = "created_at", nullable = false)
-    private ZonedDateTime createdAt = ZonedDateTime.now();
+  @Column(name = "created_at", nullable = false)
+  private ZonedDateTime createdAt = ZonedDateTime.now();
 }

@@ -12,7 +12,7 @@ import java.util.List;
 @Getter
 @Setter
 public class ContestScoreDTO {
-    private Long id;
-    private String name;
-    private List<SubmitDTO> solveProblems;
+  private Long id;
+  private String name;
+  private List<SubmitDTO> solveProblems;
 }

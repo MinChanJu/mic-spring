@@ -21,44 +21,49 @@ import java.time.ZonedDateTime;
 @Setter
 @Entity
 @Table(name = "users", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_users_user_id", columnNames = "user_id")
+    @UniqueConstraint(name = "uk_users_user_id", columnNames = "user_id")
 })
 public class User {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "name", columnDefinition = "TEXT", nullable = false)
-    private String name;
+  @Column(name = "name", columnDefinition = "TEXT", nullable = false)
+  private String name;
 
-    @Column(name = "user_id", columnDefinition = "TEXT", nullable = false)
-    private String userId;
+  @Column(name = "user_id", columnDefinition = "TEXT", nullable = false)
+  private String userId;
 
-    @Column(name = "user_pw", columnDefinition = "TEXT", nullable = false)
-    private String userPw;
+  @Column(name = "user_pw", columnDefinition = "TEXT", nullable = false)
+  private String userPw;
 
-    @Column(name = "phone", columnDefinition = "TEXT", nullable = false)
-    private String phone;
+  @Column(name = "phone", columnDefinition = "TEXT", nullable = false)
+  private String phone;
 
-    @Column(name = "email", columnDefinition = "TEXT", nullable = false)
-    private String email;
+  @Column(name = "email", columnDefinition = "TEXT", nullable = false)
+  private String email;
 
-    @Column(name = "authority", nullable = false)
-    private Short authority;
+  @Column(name = "authority", nullable = false)
+  private Short authority;
 
-    @Column(name = "contest_id", nullable = false)
-    private Long contestId;
+  @Column(name = "contest_id", nullable = false)
+  private Long contestId;
 
-    @Column(name = "created_at", nullable = false)
-    private ZonedDateTime createdAt = ZonedDateTime.now();
+  @Column(name = "created_at", nullable = false)
+  private ZonedDateTime createdAt = ZonedDateTime.now();
 
-    public boolean updateAdmin(User user) {
-        if (!user.getName().equals(name)) return false;
-        if (!user.getUserId().equals(userId)) return false;
-        if (!user.getUserPw().equals(userPw)) return false;
-        if (!user.getPhone().equals(phone)) return false;
-        if (!user.getEmail().equals(email)) return false;
+  public boolean updateAdmin(User user) {
+    if (!user.getName().equals(name))
+      return false;
+    if (!user.getUserId().equals(userId))
+      return false;
+    if (!user.getUserPw().equals(userPw))
+      return false;
+    if (!user.getPhone().equals(phone))
+      return false;
+    if (!user.getEmail().equals(email))
+      return false;
 
-        return true;
-    }
+    return true;
+  }
 }

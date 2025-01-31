@@ -15,6 +15,6 @@ import com.example.mic_spring.domain.entity.Problem;
 @Getter
 @Setter
 public class ProblemDTO {
-    private Problem problem;
-    private List<Example> examples;
+  private Problem problem;
+  private List<Example> examples;
 }

@@ -10,6 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class SubmitDTO {
-    private Long problemId;
-    private Short score;
+  private Long problemId;
+  private Short score;
 }

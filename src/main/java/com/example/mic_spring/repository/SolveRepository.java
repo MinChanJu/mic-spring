@@ -10,8 +10,11 @@ import java.util.Optional;
 
 @Repository
 public interface SolveRepository extends JpaRepository<Solve, Long> {
-    List<Solve> findByUserIdOrderByProblemIdAsc(String userId);
-    List<Solve> findByUserId(String userId);
-    List<Solve> findByProblemId(Long problemId);
-    Optional<Solve> findByUserIdAndProblemId(String userId, Long problemId);
+  List<Solve> findByUserIdOrderByProblemIdAsc(String userId);
+
+  List<Solve> findByUserId(String userId);
+
+  List<Solve> findByProblemId(Long problemId);
+
+  Optional<Solve> findByUserIdAndProblemId(String userId, Long problemId);
 }

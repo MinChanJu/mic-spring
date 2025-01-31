@@ -10,9 +10,9 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProblemListDTO {
-    private Long id;
-    private Long problemId;
-    private String problemName;
-    private String contestName;
-    private Short score;
+  private Long id;
+  private Long problemId;
+  private String problemName;
+  private String contestName;
+  private Short score;
 }

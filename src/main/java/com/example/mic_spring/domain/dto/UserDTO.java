@@ -14,19 +14,19 @@ import com.example.mic_spring.domain.entity.User;
 @Getter
 @Setter
 public class UserDTO {
-    private Long id;
-    private String name;
-    private String userId;
-    private String email;
-    private Short authority;
-    private ZonedDateTime createdAt;
+  private Long id;
+  private String name;
+  private String userId;
+  private String email;
+  private Short authority;
+  private ZonedDateTime createdAt;
 
-    public UserDTO(User user) {
-        this.id = user.getId();
-        this.name = user.getName();
-        this.userId = user.getUserId();
-        this.email = user.getEmail();
-        this.authority = user.getAuthority();
-        this.createdAt = user.getCreatedAt();
-    }
+  public UserDTO(User user) {
+    this.id = user.getId();
+    this.name = user.getName();
+    this.userId = user.getUserId();
+    this.email = user.getEmail();
+    this.authority = user.getAuthority();
+    this.createdAt = user.getCreatedAt();
+  }
 }

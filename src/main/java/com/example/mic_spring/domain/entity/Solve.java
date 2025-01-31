@@ -21,28 +21,28 @@ import java.time.ZonedDateTime;
 @Setter
 @Entity
 @Table(name = "solves", uniqueConstraints = {
-        @UniqueConstraint(name = "uk_solves_multi_user_id_problem_id", columnNames = { "user_id", "problem_id" })
+    @UniqueConstraint(name = "uk_solves_multi_user_id_problem_id", columnNames = { "user_id", "problem_id" })
 })
 public class Solve {
-    @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    private Long id;
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Long id;
 
-    @Column(name = "user_id", columnDefinition = "TEXT", nullable = false)
-    private String userId;
+  @Column(name = "user_id", columnDefinition = "TEXT", nullable = false)
+  private String userId;
 
-    @Column(name = "problem_id", nullable = false)
-    private Long problemId;
+  @Column(name = "problem_id", nullable = false)
+  private Long problemId;
 
-    @Column(name = "score", nullable = false)
-    private Short score;
+  @Column(name = "score", nullable = false)
+  private Short score;
 
-    @Column(name = "lang", columnDefinition = "TEXT", nullable = false)
-    private String lang;
+  @Column(name = "lang", columnDefinition = "TEXT", nullable = false)
+  private String lang;
 
-    @Column(name = "code", columnDefinition = "TEXT", nullable = false)
-    private String code;
+  @Column(name = "code", columnDefinition = "TEXT", nullable = false)
+  private String code;
 
-    @Column(name = "created_at", nullable = false)
-    private ZonedDateTime createdAt = ZonedDateTime.now();
+  @Column(name = "created_at", nullable = false)
+  private ZonedDateTime createdAt = ZonedDateTime.now();
 }

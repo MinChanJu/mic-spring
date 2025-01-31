@@ -9,9 +9,13 @@ import java.util.List;
 
 @Repository
 public interface ProblemRepository extends JpaRepository<Problem, Long> {
-    List<Problem> findAllByOrderByIdAsc();
-    List<Problem> findByContestIdOrderByIdAsc(Long contestId);
-    List<Problem> findByUserId(String userId);
-    List<Problem> findByUserIdOrderByIdAsc(String userId);
-    boolean existsByProblemName(String problemName);
+  List<Problem> findAllByOrderByIdAsc();
+
+  List<Problem> findByContestIdOrderByIdAsc(Long contestId);
+
+  List<Problem> findByUserId(String userId);
+
+  List<Problem> findByUserIdOrderByIdAsc(String userId);
+
+  boolean existsByProblemName(String problemName);
 }

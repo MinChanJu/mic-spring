@@ -12,6 +12,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class ProblemScoreDTO {
-    private Problem problem;
-    private Short score;
+  private Problem problem;
+  private Short score;
 }

@@ -12,6 +12,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class UserResponseDTO {
-    private User user;
-    private String token;
+  private User user;
+  private String token;
 }

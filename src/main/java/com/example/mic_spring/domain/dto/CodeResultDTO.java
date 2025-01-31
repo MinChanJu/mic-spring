@@ -10,6 +10,6 @@ import lombok.Setter;
 @Getter
 @Setter
 public class CodeResultDTO {
-    private String result;
-    private Short score;
+  private String result;
+  private Short score;
 }

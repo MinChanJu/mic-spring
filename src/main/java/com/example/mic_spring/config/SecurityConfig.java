@@ -22,38 +22,38 @@ import org.springframework.security.provisioning.InMemoryUserDetailsManager;
 @EnableWebSecurity
 public class SecurityConfig {
 
-    private final JwtUtil jwtUtil;
+  private final JwtUtil jwtUtil;
 
-    public SecurityConfig(JwtUtil jwtUtil) {
-        this.jwtUtil = jwtUtil;
-    }
+  public SecurityConfig(JwtUtil jwtUtil) {
+    this.jwtUtil = jwtUtil;
+  }
 
-    @Bean
-    public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (JWT 사용 시 필요 없음)
-                .cors(cors -> cors.configure(http)) // WebConfig의 CORS 설정 적용
-                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 비활성화
-                .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class) // JWT 필터 적용
-                .formLogin(form -> form.disable()) // 기본 폼 로그인 비활성화
-                .httpBasic(basic -> basic.disable()); // 기본 HTTP 인증 비활성화
+  @Bean
+  public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
+    http
+        .csrf(csrf -> csrf.disable()) // CSRF 비활성화 (JWT 사용 시 필요 없음)
+        .cors(cors -> cors.configure(http)) // WebConfig의 CORS 설정 적용
+        .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS)) // 세션 비활성화
+        .addFilterBefore(new JwtFilter(jwtUtil), UsernamePasswordAuthenticationFilter.class) // JWT 필터 적용
+        .formLogin(form -> form.disable()) // 기본 폼 로그인 비활성화
+        .httpBasic(basic -> basic.disable()); // 기본 HTTP 인증 비활성화
 
-        return http.build();
-    }
+    return http.build();
+  }
 
-    @Bean
-    public UserDetailsService userDetailsService() {
-        UserDetails user = User.builder()
-                .username("admin")
-                .password(passwordEncoder().encode("password123")) // 비밀번호 암호화 적용
-                .roles("USER")
-                .build();
+  @Bean
+  public UserDetailsService userDetailsService() {
+    UserDetails user = User.builder()
+        .username("admin")
+        .password(passwordEncoder().encode("password123")) // 비밀번호 암호화 적용
+        .roles("USER")
+        .build();
 
-        return new InMemoryUserDetailsManager(user);
-    }
+    return new InMemoryUserDetailsManager(user);
+  }
 
-    @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder(); // 안전한 암호화 방식 적용
-    }
+  @Bean
+  public PasswordEncoder passwordEncoder() {
+    return new BCryptPasswordEncoder(); // 안전한 암호화 방식 적용
+  }
 }
